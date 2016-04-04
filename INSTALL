@@ -1,0 +1,18 @@
+This software package has the following dependencies:
+GNU Autoconf
+GNU Automake
+GNU Libtool
+TPM2.0-TSS header files
+C compiler
+C development libraries and header files
+cmocka unit test framework
+
+To compile this software package, execute the following commands from the
+root of the source directory:
+$ ./bootstrap
+$ ./configure
+$ make
+
+To run the unit tests for this software package, execute the following
+commands from the root of the source directory:
+$ make check
