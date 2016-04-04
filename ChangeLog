@@ -1,3 +1,5 @@
 2016-04-04 Philip Tricca <philip.b.tricca@intel.com>
 * Basic structure for a TCTI library. This includes autotools build files,
   example source structure and unit tests.
+* Implement controls to limit the functions we expose through the shared
+  object.

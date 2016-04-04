@@ -12,3 +12,4 @@
     should not be installed.
   - Example unit tests are provided in the test/ directory. These test the
     basic initialization of the TCTI structure.
+  - Use 'best practices' to limit the symbols that the shared object exposes.
