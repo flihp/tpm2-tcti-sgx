@@ -1,0 +1,4 @@
+{
+    global: tss2_tcti_skeleton_init;
+    local:  *;
+};
