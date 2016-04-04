@@ -23,5 +23,6 @@ missing
 .dirstamp
 .libs
 test-driver
+test/tss2tcti-skeleton-call-tests
 test/tss2tcti-skeleton-init-param-tests
 test/tss2tcti-skeleton-struct-tests
