@@ -5,12 +5,12 @@
 #include <cmocka.h>
 
 #include <tss2/tpm20.h>
-#include <tss2tcti-skeleton.h>
-#include "tss2tcti-skeleton_priv.h"
-#include "tss2tcti-skeleton-common.h"
+#include <tss2-tcti-sgx.h>
+#include "tss2-tcti-sgx_priv.h"
+#include "tss2-tcti-sgx-common.h"
 
 /* This test module makes calls to all functions in the TSS2_TCTI_CONTEXT
- * function pointer table. Since this is just a skeleton implementation each
+ * function pointer table. Since this is just a sgx implementation each
  * function should return TSS2_TCTI_RC_NOT_IMPLEMENTED.
  * We explicitly do not call the finalize function since it has no return
  * value.

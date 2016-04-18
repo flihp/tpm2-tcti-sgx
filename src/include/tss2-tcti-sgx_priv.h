@@ -1,7 +1,10 @@
-#ifndef TSS2TCTI_SKELETON_PRIV_H
-#define TSS2TCTI_SKELETON_PRIV_H
+#ifndef TSS2_TCTI_SGX_PRIV_H
+#define TSS2_TCTI_SGX_PRIV_H
 
-#define TSS2_TCTI_SKELETON_MAGIC 0x1c8e03ff00db0f92
+/* generate your own:
+ * cat /dev/random | tr -dc 'a-f0-9' | fold -w 16 | head -n 1
+ */
+#define TSS2_TCTI_SGX_MAGIC 0x4e50bc1dcdb7623c
 
 /* This is our private TCTI structure. We're required by the spec to have
  * the same structure as the non-opaque area defined by the
@@ -11,6 +14,6 @@
  */
 typedef struct {
     TSS2_TCTI_CONTEXT_COMMON_V1 common;
-} TSS2_TCTI_SKELETON_CONTEXT;
+} TSS2_TCTI_CONTEXT_SGX;
 
-#endif /* TSS2TCTI_SKELETON_PRIV_H */
+#endif /* TSS2_TCTI_SGX_PRIV_H */

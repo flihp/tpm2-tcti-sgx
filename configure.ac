@@ -3,7 +3,7 @@ m4_define([minor_version], [1])
 m4_define([version_string],
           [major_version.minor_version])
 
-AC_INIT([tss2tcti-skeleton], [version_string])
+AC_INIT([tss2-tcti-sgx], [version_string])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_CC
 LT_INIT

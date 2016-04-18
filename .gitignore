@@ -2,6 +2,7 @@
 *.lo
 *.o
 *.log
+*.swp
 *.trs
 Makefile
 Makefile.in
@@ -23,6 +24,6 @@ missing
 .dirstamp
 .libs
 test-driver
-test/tss2tcti-skeleton-call-tests
-test/tss2tcti-skeleton-init-param-tests
-test/tss2tcti-skeleton-struct-tests
+test/tss2-tcti-sgx-call-tests
+test/tss2-tcti-sgx-init-param-tests
+test/tss2-tcti-sgx-struct-tests

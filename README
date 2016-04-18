@@ -1,5 +1,5 @@
-This is a skeleton for a library that provides a TPM command transmission
-interface (TCTI). If you have a need to implement a TCTI for sending TPM2
-commands over some new transport (shared memory, system bus, carrier pigeon)
-the code in this repository may be a useful starting point. But as always,
-YMMV.
+This is an implementation of a TPM command transmission interface (TCTI).
+It is designed for use within an software guard extensions (SGX) enclave.
+The SGX TCTI provides a mechanism for transporting TPM commands across the
+enclave boundary. The application hosting the enclave is responsible for
+propagating these commands to the the TPM.

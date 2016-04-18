@@ -1,5 +1,5 @@
-#ifndef TSS2_TCTI_SKELETON
-#define TSS2_TCTI_SKELETON
+#ifndef TSS2_TCTI_SGX
+#define TSS2_TCTI_SGX
 
 #include <tss2/tpm20.h>
 #include <tss2/tss2_tcti.h>
@@ -65,6 +65,6 @@
 #define tss2_tcti_set_locality(context, locality) \
     tss2_tcti_command (set_locality, context, locality)
 
-TSS2_RC tss2_tcti_skeleton_init (TSS2_TCTI_CONTEXT *context, size_t *size);
+TSS2_RC tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *context, size_t *size);
 
-#endif /* TSS2_TCTI_SKELETON */
+#endif /* TSS2_TCTI_SGX */
