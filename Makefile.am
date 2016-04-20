@@ -1,5 +1,7 @@
+include sgx_sdk.mk
+
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
+AM_CFLAGS = -I$(SGX_INCLUDE_PATH) -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
 
 # things we're building
 lib_LTLIBRARIES = src/libtss2-tcti-sgx.la
@@ -34,3 +36,8 @@ test_tss2_tcti_sgx_call_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
 test_tss2_tcti_sgx_call_tests_LDADD  = $(CMOCKA_LIBS) $(lib_LTLIBRARIES)
 test_tss2_tcti_sgx_call_tests_SOURCES = test/tss2-tcti-sgx-call-tests.c \
     test/tss2-tcti-sgx-common.c
+
+TSS2_TCTI_SGX_T_OUT = src/tss2-tcti-sgx_t.h src/tss2-tcti-sgx_t.c
+TSS2_TCTI_SGX_U_OUT = src/tss2-tcti-sgx_u.h src/tss2-tcti-sgx_u.c
+TSS2_TCTI_SGX_T_OBJ = src/tss2-tcti-sgx_t.o
+TSS2_TCTI_SGX_U_OBJ = src/tss2-tcti-sgx_u.o

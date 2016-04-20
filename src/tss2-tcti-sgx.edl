@@ -1,0 +1,37 @@
+enclave {
+    include "tss2/tpm20.h"
+    include "pthread.h"
+
+    struct sized_buf {
+        size_t size;
+        uint8_t *buf;
+    };
+
+    trusted {
+        public pthread_t tss2_tcti_sgx_init_ecall (void);
+    };
+
+    untrusted {
+        TSS2_RC
+        tss2_tcti_sgx_transmit_ocall   (uint64_t   session_id,
+                                        [in, sizefunc=sizeof_sized_buf] uint8_t    *command);
+        TSS2_RC
+        tss2_tcti_sgx_receive_ocall    (uint64_t  session_id,
+                                        [out] size_t    *size,
+                                        [out] uint8_t   *response,
+                                        uint32_t  timeout);
+        void
+        tss2_tcti_sgx_finalize_ocall   (uint64_t  session_id);
+        TSS2_RC
+        tss2_tcti_sgx_cancel_ocall     (uint64_t  session_id);
+        /* Not sure the getPollHandles functions makes much sense here.
+        TSS2_RC
+        tss2_tcti_sgx_get_poll_handles (uint64_t  session_id,
+                                        [out] TSS2_TCTI_POLL_HANDLE *handles,
+                                        [out] size_t    *num_handles);
+         */
+        TSS2_RC
+        tss2_tcti_sgx_set_locality     (uint64_t  session_id,
+                                        uint8_t   locality);
+   };
+};
