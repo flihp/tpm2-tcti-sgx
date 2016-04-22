@@ -43,6 +43,9 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
 static void
 tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 {
+    sgx_status_t status;
+
+    status = tss2_tcti_sgx_finalize_ocall (TSS2_TCTI_SGX_ID (tcti_context));
 }
 
 static TSS2_RC

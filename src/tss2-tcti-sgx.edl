@@ -26,9 +26,9 @@ enclave {
         tss2_tcti_sgx_receive_ocall    (uint64_t  session_id,
                                         [in, out, sizefunc=sizeof_sized_buf] sized_buf *buf,
                                         uint32_t  timeout);
-        /* Not sure the getPollHandles functions makes much sense here.
         void
         tss2_tcti_sgx_finalize_ocall   (uint64_t  session_id);
+        /* Not sure the getPollHandles functions makes much sense here.
         TSS2_RC
         tss2_tcti_sgx_cancel_ocall     (uint64_t  session_id);
         TSS2_RC
