@@ -32,10 +32,6 @@ enclave {
         tss2_tcti_sgx_cancel_ocall     (uint64_t  session_id);
         /* Not sure the getPollHandles functions makes much sense here.
         TSS2_RC
-        tss2_tcti_sgx_get_poll_handles (uint64_t  session_id,
-                                        [out] TSS2_TCTI_POLL_HANDLE *handles,
-                                        [out] size_t    *num_handles);
-        TSS2_RC
         tss2_tcti_sgx_set_locality     (uint64_t  session_id,
                                         uint8_t   locality);
         */
