@@ -10,8 +10,8 @@ sizeof_sized_buf (const struct sized_buf *sbuf)
 
 static TSS2_RC
 tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
-                             size_t size,
-                             uint8_t *command)
+                        size_t             size,
+                        uint8_t           *command)
 {
     sized_buf buf = { size, command };
     sgx_status_t status;
@@ -25,11 +25,19 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
 
 static TSS2_RC
 tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
-                            size_t *size,
-                            uint8_t *response,
-                            int32_t timeout)
+                       size_t            *size,
+                       uint8_t           *response,
+                       int32_t            timeout)
 {
-    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
+    sized_buf buf = { *size, response };
+    sgx_status_t status;
+    TSS2_RC retval;
+
+    status = tss2_tcti_sgx_receive_ocall (&retval,
+                                          TSS2_TCTI_SGX_ID (tcti_context),
+                                          &buf,
+                                          timeout);
+    return retval;
 }
 
 static void
@@ -44,21 +52,23 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
 }
 
 static TSS2_RC
-tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT *tcti_context,
-                                     TSS2_TCTI_POLL_HANDLE *handles,
-                                     size_t *num_handles)
+tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
+                                TSS2_TCTI_POLL_HANDLE *handles,
+                                size_t                *num_handles)
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 
 static TSS2_RC
-tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context, uint8_t locality)
+tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
+                            uint8_t            locality)
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 
 TSS2_RC
-tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context, size_t *size)
+tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context,
+                    size_t            *size)
 {
     sgx_status_t status;
 
