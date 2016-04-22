@@ -1,12 +1,26 @@
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
+#include "tss2-tcti-sgx_t.h"
+
+size_t
+sizeof_sized_buf (const struct sized_buf *sbuf)
+{
+    return sbuf->size;
+}
 
 static TSS2_RC
 tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
                              size_t size,
                              uint8_t *command)
 {
-    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
+    sized_buf buf = { size, command };
+    sgx_status_t status;
+    TSS2_RC retval;
+
+    status = tss2_tcti_sgx_transmit_ocall (&retval,
+                                           TSS2_TCTI_SGX_ID (tcti_context),
+                                           &buf);
+    return retval;
 }
 
 static TSS2_RC
@@ -46,6 +60,8 @@ tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context, uint8_t locality)
 TSS2_RC
 tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context, size_t *size)
 {
+    sgx_status_t status;
+
     if (tcti_context == NULL && size == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     if (tcti_context == NULL && size != NULL) {
@@ -60,6 +76,8 @@ tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context, size_t *size)
     tss2_tcti_context_cancel (tcti_context) = tss2_tcti_sgx_cancel;
     tss2_tcti_context_get_poll_handles (tcti_context) = tss2_tcti_sgx_get_poll_handles;
     tss2_tcti_context_set_locality (tcti_context) = tss2_tcti_sgx_set_locality;
+
+    status = tss2_tcti_sgx_init_ocall (&TSS2_TCTI_SGX_SESSION_ID (tcti_context));
 
     return TSS2_RC_SUCCESS;
 }

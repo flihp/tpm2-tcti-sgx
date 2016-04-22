@@ -30,9 +30,22 @@ endif
 
 SGX_INCLUDE_PATH = $(SGX_SDK)/include
 
+### we don't use -nostdinc here so we can get TPM2 types ###
+### should probably have a set of flags for compiling libraries for use by SGX
+### enclaves and a set for the enclave itself
+ENCLAVE_CFLAGS = $(SGX_COMMON_CFLAGS) -O0 -fvisibility=hidden \
+    -fpie -fstack-protector -I$(SGX_SDK)/include  -I$(SGX_SDK)/include/tlibc
+ENCLAVE_LDFLAGS = -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles \
+    -L$(SGX_LIBRARY_PATH) -Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
+    -Wl,-pie,-eenclave_entry -Wl,--export-dynamic -Wl,--defsym,__ImageBase=0 \
+    -Wl,-fuse-ld=gold -Wl,--rosegment
+ENCLAVE_LDLIBS = -Wl,--whole-archive -l$(TRTS_LIBRARY_NAME) \
+    -Wl,--no-whole-archive -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto \
+    -Wl,--end-group
+
 %_u.h %_u.c : %.edl
-	$(SGX_EDGER8R) --untrusted --search-path $(shell pwd) --search-path $(SGX_INCLUDE_PATH) --untrusted-dir $(dir $@) $^
+	$(SGX_EDGER8R) --untrusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --untrusted-dir $(srcdir)/src $^
 
 %_t.h %_t.c : %.edl
-	$(SGX_EDGER8R) --trusted --search-path $(shell pwd) --search-path $(SGX_INCLUDE_PATH) --trusted-dir $(dir $@) $^
+	$(SGX_EDGER8R) --trusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --trusted-dir $(srcdir)/src $^
 
