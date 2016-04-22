@@ -28,9 +28,9 @@ enclave {
                                         uint32_t  timeout);
         void
         tss2_tcti_sgx_finalize_ocall   (uint64_t  session_id);
-        /* Not sure the getPollHandles functions makes much sense here.
         TSS2_RC
         tss2_tcti_sgx_cancel_ocall     (uint64_t  session_id);
+        /* Not sure the getPollHandles functions makes much sense here.
         TSS2_RC
         tss2_tcti_sgx_get_poll_handles (uint64_t  session_id,
                                         [out] TSS2_TCTI_POLL_HANDLE *handles,

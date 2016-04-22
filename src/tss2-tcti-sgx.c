@@ -51,7 +51,13 @@ tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 static TSS2_RC
 tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
 {
-    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
+    sgx_status_t status;
+    TSS2_RC retval;
+
+    status = tss2_tcti_sgx_cancel_ocall (&retval,
+                                         TSS2_TCTI_SGX_ID (tcti_context));
+
+    return retval;
 }
 
 static TSS2_RC
