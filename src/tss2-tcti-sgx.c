@@ -72,7 +72,14 @@ static TSS2_RC
 tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
                             uint8_t            locality)
 {
-    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
+    sgx_status_t status;
+    TSS2_RC retval;
+
+    status = tss2_tcti_sgx_set_locality_ocall (&retval,
+                                               TSS2_TCTI_SGX_ID (tcti_context),
+                                               locality);
+
+    return retval;
 }
 
 TSS2_RC
