@@ -94,14 +94,14 @@ tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context,
         *size = sizeof (TSS2_TCTI_CONTEXT_SGX);
         return TSS2_RC_SUCCESS;
     }
-    tss2_tcti_context_magic (tcti_context) = TSS2_TCTI_SGX_MAGIC;
-    tss2_tcti_context_version (tcti_context) = 1;
-    tss2_tcti_context_transmit (tcti_context) = tss2_tcti_sgx_transmit;
-    tss2_tcti_context_receive (tcti_context) = tss2_tcti_sgx_receive;
-    tss2_tcti_context_finalize (tcti_context) = tss2_tcti_sgx_finalize;
-    tss2_tcti_context_cancel (tcti_context) = tss2_tcti_sgx_cancel;
-    tss2_tcti_context_get_poll_handles (tcti_context) = tss2_tcti_sgx_get_poll_handles;
-    tss2_tcti_context_set_locality (tcti_context) = tss2_tcti_sgx_set_locality;
+    TSS2_TCTI_MAGIC (tcti_context) = TSS2_TCTI_SGX_MAGIC;
+    TSS2_TCTI_VERSION (tcti_context) = 1;
+    TSS2_TCTI_TRANSMIT (tcti_context) = tss2_tcti_sgx_transmit;
+    TSS2_TCTI_RECEIVE (tcti_context) = tss2_tcti_sgx_receive;
+    TSS2_TCTI_FINALIZE (tcti_context) = tss2_tcti_sgx_finalize;
+    TSS2_TCTI_CANCEL (tcti_context) = tss2_tcti_sgx_cancel;
+    TSS2_TCTI_GET_POLL_HANDLES (tcti_context) = tss2_tcti_sgx_get_poll_handles;
+    TSS2_TCTI_SET_LOCALITY (tcti_context) = tss2_tcti_sgx_set_locality;
 
     status = tss2_tcti_sgx_init_ocall (&TSS2_TCTI_SGX_SESSION_ID (tcti_context));
 

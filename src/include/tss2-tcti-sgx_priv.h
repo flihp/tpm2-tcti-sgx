@@ -8,7 +8,6 @@
 #define TSS2_TCTI_SGX_SESSION_ID(context) \
     ((TSS2_TCTI_CONTEXT_SGX*)context)->session_id
 
-
 /* This is our private TCTI structure. We're required by the spec to have
  * the same structure as the non-opaque area defined by the
  * TSS2_TCTI_CONTEXT_COMMON_V1 structure. Anything after this data is opaque
