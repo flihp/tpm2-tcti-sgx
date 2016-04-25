@@ -5,8 +5,8 @@
  * cat /dev/random | tr -dc 'a-f0-9' | fold -w 16 | head -n 1
  */
 #define TSS2_TCTI_SGX_MAGIC 0x4e50bc1dcdb7623c
-#define TSS2_TCTI_SGX_SESSION_ID(context) \
-    ((TSS2_TCTI_CONTEXT_SGX*)context)->session_id
+#define TSS2_TCTI_SGX_ID(context) \
+    ((TSS2_TCTI_CONTEXT_SGX*)context)->id
 
 /* This is our private TCTI structure. We're required by the spec to have
  * the same structure as the non-opaque area defined by the
@@ -16,7 +16,7 @@
  */
 typedef struct {
     TSS2_TCTI_CONTEXT_COMMON_V1 common;
-    uint64_t                    session_id;
+    uint64_t                    id;
 } TSS2_TCTI_CONTEXT_SGX;
 
 #endif /* TSS2_TCTI_SGX_PRIV_H */

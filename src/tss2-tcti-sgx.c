@@ -103,7 +103,7 @@ tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context,
     TSS2_TCTI_GET_POLL_HANDLES (tcti_context) = tss2_tcti_sgx_get_poll_handles;
     TSS2_TCTI_SET_LOCALITY (tcti_context) = tss2_tcti_sgx_set_locality;
 
-    status = tss2_tcti_sgx_init_ocall (&TSS2_TCTI_SGX_SESSION_ID (tcti_context));
+    status = tss2_tcti_sgx_init_ocall (&TSS2_TCTI_SGX_ID (tcti_context));
 
     return TSS2_RC_SUCCESS;
 }
