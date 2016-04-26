@@ -12,11 +12,6 @@ enclave {
     };
 
     untrusted {
-        /* It's possible for the enclave to have multiple threads / TCTIs. The
-         * hosting application may need to have some sort of in-process
-         * resource manager eventually. For now we assign the TCTI a session
-         * identifier when intialized.
-         */
         uint64_t
         tss2_tcti_sgx_init_ocall       (void);
         TSS2_RC
