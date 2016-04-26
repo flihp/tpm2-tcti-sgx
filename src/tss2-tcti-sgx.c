@@ -1,6 +1,6 @@
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
-#include "tss2-tcti-sgx_t.h"
+#include "tss2_tcti_sgx_t.h"
 
 size_t
 sizeof_sized_buf (const struct sized_buf *sbuf)

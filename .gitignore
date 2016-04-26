@@ -24,8 +24,8 @@ missing
 .dirstamp
 .libs
 test-driver
-src/tss2-tcti-sgx_t.*
-src/tss2-tcti-sgx_u.*
+src/tss2_tcti_sgx_t.*
+src/tss2_tcti_sgx_u.*
 test/tss2-tcti-sgx-call-tests
 test/tss2-tcti-sgx-init-param-tests
 test/tss2-tcti-sgx-struct-tests

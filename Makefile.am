@@ -3,10 +3,10 @@ include sgx_sdk.mk
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_PATH) -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
-    src/tss2-tcti-sgx_t.h \
-    src/tss2-tcti-sgx_t.c \
-    src/tss2-tcti-sgx_u.h \
-    src/tss2-tcti-sgx_u.c
+    src/tss2_tcti_sgx_t.h \
+    src/tss2_tcti_sgx_t.c \
+    src/tss2_tcti_sgx_u.h \
+    src/tss2_tcti_sgx_u.c
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
@@ -29,7 +29,7 @@ src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined 
     -Wl,--version-script=src/tss2-tcti-sgx.map
 src_libtss2_tcti_sgx_la_LDLIBS  = $(ENCLAVE_LDLIBS)
 src_libtss2_tcti_sgx_la_SOURCES = src/tss2-tcti-sgx.c src/tss2-tcti-sgx.map \
-    src/tss2-tcti-sgx_t.c src/tss2-tcti-sgx_t.h
+    src/tss2_tcti_sgx_t.c src/tss2_tcti_sgx_t.h
 
 # unit tests
 test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
