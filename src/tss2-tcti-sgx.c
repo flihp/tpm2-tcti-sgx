@@ -65,7 +65,13 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
                                 TSS2_TCTI_POLL_HANDLE *handles,
                                 size_t                *num_handles)
 {
-    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
+    sgx_status_t status;
+    TSS2_RC retval;
+
+    status =
+        tss2_tcti_sgx_get_poll_handles_ocall (&retval,
+                                              TSS2_TCTI_SGX_ID (tcti_context));
+    return retval;
 }
 
 static TSS2_RC

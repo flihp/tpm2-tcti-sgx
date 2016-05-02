@@ -10,7 +10,9 @@ CLEANFILES = \
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
-lib_LTLIBRARIES = src/libtss2-tcti-sgx.la
+lib_LTLIBRARIES = \
+    src/libtss2-tcti-sgx.la \
+    src/libtss2-tcti-sgx-mgr.la
 
 # connect unit tests to the test harness
 check_PROGRAMS  = \
@@ -23,13 +25,20 @@ TESTS = $(check_PROGRAMS)
 libtss2_tcti_sgxdir      = $(includedir)
 libtss2_tcti_sgx_HEADERS = $(srcdir)/include/tss2-tcti-sgx.h
 
-# library
+# enclave library
 src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined \
     -Wl,--version-script=src/tss2-tcti-sgx.map
 src_libtss2_tcti_sgx_la_LDLIBS  = $(ENCLAVE_LDLIBS)
 src_libtss2_tcti_sgx_la_SOURCES = src/tss2-tcti-sgx.c src/tss2-tcti-sgx.map \
     src/tss2_tcti_sgx_t.c src/tss2_tcti_sgx_t.h
+
+# application library
+src_libtss2_tcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
+src_libtss2_tcti_sgx_mgr_la_LDFLAGS = -Wl,--version-script=src/tss2-tcti-sgx-mgr.map
+src_libtss2_tcti_sgx_mgr_la_LDLIBS  = $(GLIB_LIBS)
+src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2-tcti-sgx-mgr.c \
+    src/tss2-tcti-sgx-mgr.map src/tss2_tcti_sgx_u.c
 
 # unit tests
 test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)

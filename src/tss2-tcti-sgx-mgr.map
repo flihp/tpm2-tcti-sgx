@@ -1,0 +1,11 @@
+{
+    global:
+        tss2_tcti_sgx_mgr_init;
+        tss2_tcti_sgx_init_ocall;
+        tss2_tcti_sgx_transmit_ocall;
+        tss2_tcti_sgx_receive_ocall;
+        tss2_tcti_sgx_finalize_ocall;
+        tss2_tcti_sgx_cancel_ocall;
+        tss2_tcti_sgx_set_locality_ocall;
+    local: *;
+};
