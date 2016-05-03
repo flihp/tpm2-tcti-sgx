@@ -25,6 +25,14 @@ TESTS = $(check_PROGRAMS)
 libtss2_tcti_sgxdir      = $(includedir)
 libtss2_tcti_sgx_HEADERS = $(srcdir)/include/tss2-tcti-sgx.h
 
+CMOCKA_WRAPS = -Wl,--wrap=tss2_tcti_sgx_init_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_transmit_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_receive_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_finalize_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_cancel_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_get_poll_handles_ocall \
+    -Wl,--wrap=tss2_tcti_sgx_set_locality_ocall
+
 # enclave library
 src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined \
@@ -41,15 +49,22 @@ src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2-tcti-sgx-mgr.c \
     src/tss2-tcti-sgx-mgr.map src/tss2_tcti_sgx_u.c
 
 # unit tests
-test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_tss2_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) $(lib_LTLIBRARIES)
+test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) -I/opt/intel/sgxsdk/include
+test_tss2_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_init_param_tests_SOURCES = \
-    test/tss2-tcti-sgx-init-param-tests.c
-test_tss2_tcti_sgx_struct_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_tss2_tcti_sgx_struct_tests_LDADD  = $(CMOCKA_LIBS) $(lib_LTLIBRARIES)
+    test/tss2-tcti-sgx-init-param-tests.c \
+    test/tss2-tcti-sgx_null-wraps.c \
+    src/tss2-tcti-sgx.c
+test_tss2_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
+test_tss2_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_struct_tests_SOURCES = test/tss2-tcti-sgx-struct-tests.c \
-    test/tss2-tcti-sgx-common.c
-test_tss2_tcti_sgx_call_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_tss2_tcti_sgx_call_tests_LDADD  = $(CMOCKA_LIBS) $(lib_LTLIBRARIES)
+    test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
+    src/tss2-tcti-sgx.c
+test_tss2_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
+test_tss2_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_call_tests_SOURCES = test/tss2-tcti-sgx-call-tests.c \
-    test/tss2-tcti-sgx-common.c
+    test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
+    src/tss2-tcti-sgx.c
