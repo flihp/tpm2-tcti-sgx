@@ -16,7 +16,7 @@ static void
 tss2_tcti_struct_magic_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    assert_int_equal (tss2_tcti_context_magic (context), TSS2_TCTI_SGX_MAGIC);
+    assert_int_equal (TSS2_TCTI_MAGIC (context), TSS2_TCTI_SGX_MAGIC);
 }
 
 /* Ensure that after initialization the 'version' value in the TCTI structure is
@@ -26,7 +26,7 @@ static void
 tss2_tcti_struct_version_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    assert_int_equal (tss2_tcti_context_version (context), 1);
+    assert_int_equal (TSS2_TCTI_VERSION (context), 1);
 }
 
 int
