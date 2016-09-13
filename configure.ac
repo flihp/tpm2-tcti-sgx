@@ -11,6 +11,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_FILES([Makefile])
 PKG_CHECK_MODULES([CMOCKA],[cmocka])
 PKG_CHECK_MODULES([GLIB],[glib-2.0])
+PKG_CHECK_MODULES([SAPI],[sapi])
 # get sizeof void pointer, define variable to let Makefile.am know
 AC_CHECK_SIZEOF([void*])
 AM_CONDITIONAL([SGX_32BITS],[test x$ac_cv_sizeof_voidp = x4])
