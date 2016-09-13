@@ -20,7 +20,15 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
     status = tss2_tcti_sgx_transmit_ocall (&retval,
                                            TSS2_TCTI_SGX_ID (tcti_context),
                                            &buf);
-    return retval;
+    /**
+     * Map SGX error codes to TSS2_RC error codes. If no SGX error return
+     * the 'retval' parameter that contains the TSS2_RC value from outside
+     * the enclave.
+     */
+    if (status == SGX_SUCCESS)
+        return retval;
+    else
+        return TSS2_TCTI_RC_GENERAL_FAILURE;
 }
 
 static TSS2_RC

@@ -1,10 +1,11 @@
 #include <errno.h>
 #include <stdio.h>
+#include <sgx_error.h>
 
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <tss2/tpm20.h>
+#include <tpm20.h>
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
 #include "tss2-tcti-sgx-common.h"
@@ -16,14 +17,49 @@
  * value.
  */
 static void
-tss2_tcti_call_transmit_test (void **state)
+tss2_tcti_call_transmit_success_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
     size_t size;
     uint8_t command;
 
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, SGX_SUCCESS);
+
     assert_int_equal (tss2_tcti_transmit (context, size, &command),
-                      TSS2_TCTI_RC_NOT_IMPLEMENTED);
+                      TSS2_RC_SUCCESS);
+}
+/**
+ * In this case we force a failure in the transmit ocall function. In this
+ * case the TSS2_RC value is garbage and won't be returned. Instead the
+ * transmit function attempts to map the sgx_status_t value to a TSS2_RC.
+ * Currently all SGX errors map to TSS2_TCTI_RC_GENERAL_FAILURE.
+ */
+static void
+tss2_tcti_call_transmit_sgx_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    size_t size;
+    uint8_t command;
+
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, SGX_ERROR_OUT_OF_EPC);
+
+    assert_int_equal (tss2_tcti_transmit (context, size, &command),
+                      TSS2_TCTI_RC_GENERAL_FAILURE);
+}
+static void
+tss2_tcti_call_transmit_tcti_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    size_t size;
+    uint8_t command;
+
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, TSS2_SYS_RC_BAD_REFERENCE);
+    will_return (__wrap_tss2_tcti_sgx_transmit_ocall, SGX_SUCCESS);
+
+    assert_int_equal (tss2_tcti_transmit (context, size, &command),
+                      TSS2_SYS_RC_BAD_REFERENCE);
 }
 static void
 tss2_tcti_call_receive_test (void **state)
@@ -67,7 +103,13 @@ int
 main(int argc, char* argv[])
 {
     const UnitTest tests[] = {
-        unit_test_setup_teardown (tss2_tcti_call_transmit_test,
+        unit_test_setup_teardown (tss2_tcti_call_transmit_success_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_transmit_sgx_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_transmit_tcti_fail_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_receive_test,

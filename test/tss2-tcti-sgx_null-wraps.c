@@ -5,7 +5,14 @@
  * implement the behavior elsewhere.
  */
 #include <stdint.h>
+#include <stddef.h>
+#include <stdarg.h>
 #include <sgx_error.h>
+
+#include <setjmp.h>
+#include <cmocka.h>
+
+#include "tss2_tcti_sgx_t.h"
 
 sgx_status_t
 __wrap_tss2_tcti_sgx_init_ocall (uint64_t *retval)
@@ -14,9 +21,12 @@ __wrap_tss2_tcti_sgx_init_ocall (uint64_t *retval)
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_transmit_ocall (uint64_t *retval)
+__wrap_tss2_tcti_sgx_transmit_ocall (TSS2_RC         *retval,
+                                     uint64_t         id,
+                                     sized_buf const *buf)
 {
-    return SGX_SUCCESS;
+    *retval = (TSS2_RC)mock ();
+    return (sgx_status_t)mock ();
 }
 
 sgx_status_t
