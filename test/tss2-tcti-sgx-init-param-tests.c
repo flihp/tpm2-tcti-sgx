@@ -3,6 +3,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include <sgx_error.h>
 #include <tss2/tpm20.h>
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
@@ -41,7 +42,27 @@ tss2_tcti_sgx_init_allnull_is_bad_value (void **state)
     ret = tss2_tcti_sgx_init (NULL, NULL);
     assert_int_equal (ret, TSS2_TCTI_RC_BAD_VALUE);
 }
+/**
+ * When given a non-NULL context the init function should set up various
+ * bits of data in the context structure and return a success indicator.
+ * This requires an ocall to register the context with the RM/TAB in the
+ * host application. This is mocked to return success.
+ * NOTE: may be useful to check the internals of the context structure
+ *       to verify the init function set things up right.
+ */
+static void
+tss2_tcti_sgx_init_success_mock_ocall (void **state)
+{
+    TSS2_RC ret;
+    TSS2_TCTI_CONTEXT *ctx = calloc (1, sizeof (TSS2_TCTI_CONTEXT_SGX));
 
+    assert_non_null (ctx);
+    will_return (__wrap_tss2_tcti_sgx_init_ocall, 1);
+    will_return (__wrap_tss2_tcti_sgx_init_ocall, SGX_SUCCESS);
+
+    ret = tss2_tcti_sgx_init (ctx, NULL);
+    assert_int_equal (ret, TSS2_RC_SUCCESS);
+}
 int
 main(int argc, char* argv[])
 {
@@ -49,6 +70,7 @@ main(int argc, char* argv[])
         unit_test(tss2_tcti_sgx_init_size_test),
         unit_test(tss2_tcti_sgx_init_success_return_value_test),
         unit_test(tss2_tcti_sgx_init_allnull_is_bad_value),
+        unit_test(tss2_tcti_sgx_init_success_mock_ocall),
     };
     return run_tests(tests);
 }

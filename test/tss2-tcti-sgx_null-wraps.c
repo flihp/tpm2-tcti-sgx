@@ -14,10 +14,17 @@
 
 #include "tss2_tcti_sgx_t.h"
 
+/**
+ * This is a mock function for the initialization OCall.
+ * Instead of actually calling out to the external RM/TAB
+ * initialization function we pop a value off of the cmocka
+ * stack for the ID (retval) and the sgx return status.
+ */
 sgx_status_t
 __wrap_tss2_tcti_sgx_init_ocall (uint64_t *retval)
 {
-    return SGX_SUCCESS;
+    *retval = (TSS2_RC)mock ();
+    return (sgx_status_t)mock ();
 }
 
 sgx_status_t

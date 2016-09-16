@@ -1,7 +1,7 @@
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(SAPI_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
+AM_CFLAGS = $(SAPI_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
     src/tss2_tcti_sgx_t.h \
     src/tss2_tcti_sgx_t.c \
