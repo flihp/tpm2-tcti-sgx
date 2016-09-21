@@ -1,9 +1,13 @@
+*.gcda
+*.gcno
+*.info
 *.la
 *.lo
 *.o
 *.log
 *.swp
 *.trs
+*-coverage/
 Makefile
 Makefile.in
 aclocal.m4
@@ -18,7 +22,8 @@ depcomp
 install-sh
 libtool
 ltmain.sh
-m4/
+m4/libtool.m4
+m4/lt*.m4
 missing
 .deps
 .dirstamp

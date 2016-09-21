@@ -1,6 +1,7 @@
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
+@CODE_COVERAGE_RULES@
 AM_CFLAGS = $(SAPI_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
     src/tss2_tcti_sgx_t.h \
@@ -49,21 +50,25 @@ src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2-tcti-sgx-mgr.c \
     src/tss2-tcti-sgx-mgr.map src/tss2_tcti_sgx_u.c
 
 # unit tests
-test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) -I/opt/intel/sgxsdk/include
-test_tss2_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS) -I/opt/intel/sgxsdk/include
+test_tss2_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
+    $(CODE_COVERAGE_LIBS)
 test_tss2_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_init_param_tests_SOURCES = \
     test/tss2-tcti-sgx-init-param-tests.c \
     test/tss2-tcti-sgx_null-wraps.c \
     src/tss2-tcti-sgx.c
-test_tss2_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_tss2_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS)
+test_tss2_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tss2_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_struct_tests_SOURCES = test/tss2-tcti-sgx-struct-tests.c \
     test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
     src/tss2-tcti-sgx.c
-test_tss2_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS)
-test_tss2_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS)
+test_tss2_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS) 
+test_tss2_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tss2_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tss2_tcti_sgx_call_tests_SOURCES = test/tss2-tcti-sgx-call-tests.c \
     test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
