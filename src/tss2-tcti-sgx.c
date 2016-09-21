@@ -19,7 +19,6 @@ sizeof_sized_buf (const struct sized_buf *sbuf)
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
- * - TSS2_TCTI_RC_BAD_REFERENCE when the context is NULL
  * - TSS2_TCTI_RC_BAD_SEQUENCE  when the state machine is not in the
  *   READY_TO_TRANSMIT state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
@@ -33,8 +32,6 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (tcti_context == NULL)
-        return TSS2_TCTI_RC_BAD_REFERENCE;
     if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -59,7 +56,6 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
- * - TSS2_TCTI_RC_BAD_REFERENCE when the context is NULL
  * - TSS2_TCTI_RC_BAD_SEQUENCE  when the state machine is not in the
  *   READY_TO_RECEIVE state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
@@ -74,8 +70,6 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (tcti_context == NULL)
-        return TSS2_TCTI_RC_BAD_REFERENCE;
     if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -116,7 +110,6 @@ tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
- * - TSS2_TCTI_RC_BAD_REFERENCE when the context is NULL
  * - TSS2_TCTI_RC_BAD_SEQUENCE  when the state machine is not in the
  *   READY_TO_RECEIVE state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
@@ -127,8 +120,6 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (tcti_context == NULL)
-        return TSS2_TCTI_RC_BAD_REFERENCE;
     if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -148,7 +139,6 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
- * - TSS2_TCTI_RC_BAD_REFERENCE when the context is NULL
  * - TSS2_TCTI_RC_BAD_SEQUENCE  when the state machine is not in the
  *   READY_TO_RECEIVE state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
@@ -165,8 +155,6 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (tcti_context == NULL)
-        return TSS2_TCTI_RC_BAD_REFERENCE;
     if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -186,7 +174,6 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
- * - TSS2_TCTI_RC_BAD_REFERENCE when the context is NULL
  * - TSS2_TCTI_RC_BAD_SEQUENCE  when the state machine is not in the
  *   READY_TO_TRANSMIT state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
@@ -198,8 +185,6 @@ tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (tcti_context == NULL)
-        return TSS2_TCTI_RC_BAD_REFERENCE;
     if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
