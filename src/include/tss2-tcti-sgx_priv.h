@@ -42,4 +42,19 @@ typedef struct {
     tss2_tcti_sgx_state_t       state;
 } TSS2_TCTI_CONTEXT_SGX;
 
+TSS2_RC    tss2_tcti_sgx_transmit         (TSS2_TCTI_CONTEXT     *tcti_context,
+                                           size_t                 size,
+                                           uint8_t               *command);
+TSS2_RC    tss2_tcti_sgx_receive          (TSS2_TCTI_CONTEXT     *tcti_context,
+                                           size_t                *size,
+                                           uint8_t               *response,
+                                           int32_t                timeout);
+void       tss2_tcti_sgx_finalize         (TSS2_TCTI_CONTEXT     *tcti_context);
+TSS2_RC    tss2_tcti_sgx_cancel           (TSS2_TCTI_CONTEXT     *tcti_context);
+TSS2_RC    tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
+                                           TSS2_TCTI_POLL_HANDLE *handles,
+                                           size_t                *num_handles);
+TSS2_RC    tss2_tcti_sgx_set_locality     (TSS2_TCTI_CONTEXT     *tcti_context,
+                                           uint8_t                locality);
+
 #endif /* TSS2_TCTI_SGX_PRIV_H */

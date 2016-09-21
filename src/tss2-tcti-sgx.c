@@ -24,7 +24,7 @@ sizeof_sized_buf (const struct sized_buf *sbuf)
  *   READY_TO_TRANSMIT state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
-static TSS2_RC
+TSS2_RC
 tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
                         size_t             size,
                         uint8_t           *command)
@@ -64,7 +64,7 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
  *   READY_TO_RECEIVE state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
-static TSS2_RC
+TSS2_RC
 tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
                        size_t            *size,
                        uint8_t           *response,
@@ -98,7 +98,7 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
  * This function returns void so all errors are silently ignored (this is
  * required by the TSS spec).
  */
-static void
+void
 tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 {
     sgx_status_t status;
@@ -121,7 +121,7 @@ tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
  *   READY_TO_RECEIVE state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
-static TSS2_RC
+TSS2_RC
 tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
 {
     sgx_status_t status;
@@ -157,7 +157,7 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
  *       enclave boundary will likely reply with TSS2_TCTI_RC_NOT_IMPLEMENTED
  *       while the ocall will still succeed.
  */
-static TSS2_RC
+TSS2_RC
 tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
                                 TSS2_TCTI_POLL_HANDLE *handles,
                                 size_t                *num_handles)
@@ -191,7 +191,7 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
  *   READY_TO_TRANSMIT state
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
-static TSS2_RC
+TSS2_RC
 tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
                             uint8_t            locality)
 {
