@@ -152,19 +152,7 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
                                 TSS2_TCTI_POLL_HANDLE *handles,
                                 size_t                *num_handles)
 {
-    sgx_status_t status;
-    TSS2_RC retval;
-
-    if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
-        return TSS2_TCTI_RC_BAD_SEQUENCE;
-
-    status =
-        tss2_tcti_sgx_get_poll_handles_ocall (&retval,
-                                              TSS2_TCTI_SGX_ID (tcti_context));
-    if (status == SGX_SUCCESS)
-        return retval;
-    else
-        return TSS2_TCTI_RC_GENERAL_FAILURE;
+    return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 /**
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT

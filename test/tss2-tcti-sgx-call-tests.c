@@ -204,6 +204,10 @@ tss2_tcti_call_cancel_sgx_fail_test (void **state)
     rc = tss2_tcti_sgx_cancel (context);
     assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
 }
+/**
+ * The concept of polling (like POSIX 'select' / 'poll') doesn't work
+ * across the enclave boundary. It's not implemented.
+ */
 static void
 tss2_tcti_call_get_poll_handles_test (void **state)
 {
