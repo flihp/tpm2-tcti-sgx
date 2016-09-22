@@ -165,13 +165,44 @@ tss2_tcti_call_receive_bad_sequence_test (void **state)
     rc = tss2_tcti_sgx_receive (context, &size, &response, timeout);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
 }
+/**
+ * This tests the default case for the cancel command. The mock cancel
+ * function will return success for both the SGX command and the external
+ * TCTI. We also set the context state to READY_TO_RECEIVE indicating
+ * that a command has been sent and can be canceled.
+ */
 static void
-tss2_tcti_call_cancel_test (void **state)
+tss2_tcti_call_cancel_success_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    TSS2_RC rc;
 
-    assert_int_equal (tss2_tcti_sgx_cancel (context),
-                      TSS2_TCTI_RC_NOT_IMPLEMENTED);
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, SGX_SUCCESS);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_cancel (context);
+    assert_int_equal (rc, TSS2_RC_SUCCESS);
+}
+/**
+ * This tests the code path for handling errors from the SGX ocall for
+ * the cancel command. In this case the SGX error is transport specific
+ * and is mapped to a generic TCTI error code.
+ */
+static void
+tss2_tcti_call_cancel_sgx_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    TSS2_RC rc;
+
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, SGX_ERROR_HYPERV_ENABLED);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_cancel (context);
+    assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
 }
 static void
 tss2_tcti_call_get_poll_handles_test (void **state)
@@ -221,7 +252,10 @@ main(int argc, char* argv[])
         unit_test_setup_teardown (tss2_tcti_call_receive_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
-        unit_test_setup_teardown (tss2_tcti_call_cancel_test,
+        unit_test_setup_teardown (tss2_tcti_call_cancel_success_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_cancel_sgx_fail_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_get_poll_handles_test,

@@ -51,9 +51,11 @@ __wrap_tss2_tcti_sgx_finalize_ocall (uint64_t *retval)
 {}
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_cancel_ocall (uint64_t *retval)
+__wrap_tss2_tcti_sgx_cancel_ocall (TSS2_RC  *retval,
+                                   uint64_t  id)
 {
-    return SGX_SUCCESS;
+    *retval = (TSS2_RC)mock ();
+    return (sgx_status_t)mock ();
 }
 
 sgx_status_t
