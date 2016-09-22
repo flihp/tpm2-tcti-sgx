@@ -48,6 +48,12 @@ tss2_tcti_call_transmit_sgx_fail_test (void **state)
     assert_int_equal (tss2_tcti_sgx_transmit (context, size, &command),
                       TSS2_TCTI_RC_GENERAL_FAILURE);
 }
+/**
+ * This test case uses the mock tss2_tcti_sgx_transmit function to cause
+ * success in the SGX function, but failure in the TCTI layer. We're
+ * actually using the wrong layer for the response code but the end result
+ * is the same.
+ */
 static void
 tss2_tcti_call_transmit_tcti_fail_test (void **state)
 {
@@ -61,6 +67,24 @@ tss2_tcti_call_transmit_tcti_fail_test (void **state)
     assert_int_equal (tss2_tcti_sgx_transmit (context, size, &command),
                       TSS2_SYS_RC_BAD_REFERENCE);
 }
+/**
+ * This test intentionally sets the state of the context to the
+ * READY_TO_RECEIVE state, then calls the transmit function. This should
+ * cause the function to give us a return code indicating a bad sequence.
+ */
+static void
+tss2_tcti_call_transmit_bad_sequence_test (void **state)
+{
+    TSS2_TCTI_CONTEXT     *context     = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    assert_int_equal (tss2_tcti_sgx_transmit (context, 0, NULL),
+                      TSS2_TCTI_RC_BAD_SEQUENCE);
+}
+/**
+ *
+ */
 static void
 tss2_tcti_call_receive_test (void **state)
 {
@@ -111,6 +135,9 @@ main(int argc, char* argv[])
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_transmit_tcti_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_transmit_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_receive_test,
