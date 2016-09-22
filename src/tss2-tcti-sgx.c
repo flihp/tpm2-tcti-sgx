@@ -3,15 +3,6 @@
 #include "tss2_tcti_sgx_t.h"
 
 /**
- * Simple accessor. Not sure it's any more simple than directly accessing
- * the size field.
- */
-size_t
-sizeof_sized_buf (const struct sized_buf *sbuf)
-{
-    return sbuf->size;
-}
-/**
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * transmit function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
