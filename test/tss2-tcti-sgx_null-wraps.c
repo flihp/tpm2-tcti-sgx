@@ -65,7 +65,10 @@ __wrap_tss2_tcti_sgx_get_poll_handles_ocall (uint64_t *retval)
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_set_locality_ocall (uint64_t *retval)
+__wrap_tss2_tcti_sgx_set_locality_ocall (TSS2_RC   *retval,
+                                         uint64_t   id,
+                                         uint8_t    locality)
 {
-    return SGX_SUCCESS;
+    *retval = (TSS2_RC)mock ();
+    return (sgx_status_t)mock ();
 }

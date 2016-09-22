@@ -256,14 +256,77 @@ tss2_tcti_call_get_poll_handles_test (void **state)
     rc = tss2_tcti_sgx_get_poll_handles (context, &handles, &num_handles);
     assert_int_equal (rc, TSS2_TCTI_RC_NOT_IMPLEMENTED);
 }
+/**
+ * This tests the common case for the cancel command. The mock function
+ * is set to return success for both SGX and the external TCTI. The context
+ * state is left in the READY_TO_RECEIVE state.
+ */
 static void
-tss2_tcti_call_set_locality_test (void **state)
+tss2_tcti_call_set_locality_success_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
     uint8_t locality;
+    TSS2_RC rc;
 
-    assert_int_equal (tss2_tcti_sgx_set_locality (context, locality),
-                      TSS2_TCTI_RC_NOT_IMPLEMENTED);
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, SGX_SUCCESS);
+    rc = tss2_tcti_sgx_set_locality (context, locality);
+    assert_int_equal (rc, TSS2_RC_SUCCESS);
+}
+/**
+ * This tests the return path for errors originating from the SGX ocall.
+ * Just like the other ocalls, setLocality maps all SGX error codes to the
+ * generic TSS2_TCTI_RC_GENERAL_FAILURE so any SGX erorr code (that we
+ * induce with the mock ocall) should produce this TSS2_RC.
+ */
+static void
+tss2_tcti_call_set_locality_sgx_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    uint8_t locality;
+    TSS2_RC rc;
+
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, SGX_ERROR_OCALL_NOT_ALLOWED);
+    rc = tss2_tcti_sgx_set_locality (context, locality);
+    assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
+}
+/**
+ * This tests the return path for errors originating from the TCTI that
+ * are propagated across the enclave boundary back to us from the external
+ * TCTI. This requires that we setup the mock function to get a success
+ * from SGX but an error from the TCTI.
+ */
+static void
+tss2_tcti_call_set_locality_tcti_fail_test (void **state)
+{
+
+    TSS2_TCTI_CONTEXT *context = *state;
+    uint8_t locality;
+    TSS2_RC rc;
+
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, TSS2_TCTI_RC_NOT_PERMITTED);
+    will_return (__wrap_tss2_tcti_sgx_set_locality_ocall, SGX_SUCCESS);
+    rc = tss2_tcti_sgx_set_locality (context, locality);
+    assert_int_equal (rc, TSS2_TCTI_RC_NOT_PERMITTED);
+}
+/**
+ * This tests the TCTI state machine: when we set the locality we should
+ * not be waiting for a response to a previous command. So the state should
+ * be READY_TO_TRANSMIT.
+ */
+static void
+tss2_tcti_call_set_locality_bad_sequence_test (void **state)
+{
+
+    TSS2_TCTI_CONTEXT     *context     = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    uint8_t locality;
+    TSS2_RC rc;
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_set_locality (context, locality);
+    assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
 }
 int
 main(int argc, char* argv[])
@@ -308,7 +371,16 @@ main(int argc, char* argv[])
         unit_test_setup_teardown (tss2_tcti_call_get_poll_handles_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
-        unit_test_setup_teardown (tss2_tcti_call_set_locality_test,
+        unit_test_setup_teardown (tss2_tcti_call_set_locality_success_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_set_locality_sgx_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_set_locality_tcti_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_set_locality_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
     };
