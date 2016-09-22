@@ -205,6 +205,43 @@ tss2_tcti_call_cancel_sgx_fail_test (void **state)
     assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
 }
 /**
+ * This tests the code path for handling errors from the TCTI outside the
+ * enclave. In this case the SGX ocall succeeds. The returned TCTI error
+ * code should be the same one passed to the mock ocall.
+ */
+static void
+tss2_tcti_call_cancel_tcti_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    TSS2_RC rc;
+
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, TSS2_TCTI_RC_NOT_IMPLEMENTED);
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, SGX_SUCCESS);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_cancel (context);
+    assert_int_equal (rc, TSS2_TCTI_RC_NOT_IMPLEMENTED);
+}
+/**
+ * This tests the code path for handling an error condition where the caller
+ * invokes the cancel command without having a command to cancel. The context
+ * must be in the READY_TO_RECEIVE state for a cancel call to be make. Here
+ * the context is freshly initialized and so it's in the READY_TO_TRANSMIT
+ * state. Calling cancel in this state should cause the function to return
+ * a BAD_SEQUENCE error code.
+ */
+static void
+tss2_tcti_call_cancel_bad_sequence_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    TSS2_RC rc;
+
+    rc = tss2_tcti_sgx_cancel (context);
+    assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
+}
+/**
  * The concept of polling (like POSIX 'select' / 'poll') doesn't work
  * across the enclave boundary. It's not implemented.
  */
@@ -260,6 +297,12 @@ main(int argc, char* argv[])
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_cancel_sgx_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_cancel_tcti_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_cancel_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_get_poll_handles_test,
