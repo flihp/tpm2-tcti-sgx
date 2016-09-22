@@ -83,18 +83,87 @@ tss2_tcti_call_transmit_bad_sequence_test (void **state)
                       TSS2_TCTI_RC_BAD_SEQUENCE);
 }
 /**
- *
+ * This test sets up the common path in the receive function. This is
+ * defined by both the SGX ocall and the external TCTI returning success
+ * codes.
  */
 static void
-tss2_tcti_call_receive_test (void **state)
+tss2_tcti_call_receive_success_test (void **state)
+{
+    TSS2_TCTI_CONTEXT     *context     = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    size_t   size;
+    uint8_t  response;
+    uint32_t timeout;
+    TSS2_RC  rc;
+
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, SGX_SUCCESS);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_receive (context, &size, &response, timeout);
+    assert_int_equal (rc, TSS2_RC_SUCCESS);
+}
+/**
+ * In this test we force the ocall to return an SGX error. In this case
+ * we should get a generic TCTI error code.
+ */
+static void
+tss2_tcti_call_receive_sgx_fail_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
+    size_t   size;
+    uint8_t  response;
+    uint32_t timeout;
+    TSS2_RC  rc;
+
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, TSS2_RC_SUCCESS);
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, SGX_ERROR_OUT_OF_EPC);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_receive (context, &size, &response, timeout);
+    assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
+}
+/**
+ * This test forces a failure status code to be returned in the TCTI RC
+ * that comes from the TCTI outside the enclave while the ocall succeeds.
+ * This should cause the call to _receive to return the RC.
+ */
+static void
+tss2_tcti_call_receive_tcti_fail_test (void **state)
+{
+    TSS2_TCTI_CONTEXT *context = *state;
+    TSS2_TCTI_CONTEXT_SGX *sgx_context = *state;
     size_t size;
     uint8_t response;
     uint32_t timeout;
+    TSS2_RC rc;
 
-    assert_int_equal (tss2_tcti_sgx_receive (context, &size, &response, timeout),
-                      TSS2_TCTI_RC_NOT_IMPLEMENTED);
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, TSS2_TCTI_RC_BAD_REFERENCE);
+    will_return (__wrap_tss2_tcti_sgx_receive_ocall, SGX_SUCCESS);
+
+    TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
+    rc = tss2_tcti_sgx_receive (context, &size, &response, timeout);
+    assert_int_equal (rc, TSS2_TCTI_RC_BAD_REFERENCE);
+}
+/**
+ * The TCTI context must be READY_TO_RECEIVE when we call the _receive
+ * function. In this test we don't set this value so it's the default
+ * value from the init function which is READY_TO_TRANSMIT. So a call
+ * to _receive after init should cause a BAD_SEQUENCE error.
+ */
+static void
+tss2_tcti_call_receive_bad_sequence_test (void **state)
+{
+    TSS2_TCTI_CONTEXT     *context     = *state;
+    size_t size;
+    uint8_t response;
+    uint32_t timeout;
+    TSS2_RC rc;
+
+    rc = tss2_tcti_sgx_receive (context, &size, &response, timeout);
+    assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
 }
 static void
 tss2_tcti_call_cancel_test (void **state)
@@ -140,7 +209,16 @@ main(int argc, char* argv[])
         unit_test_setup_teardown (tss2_tcti_call_transmit_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
-        unit_test_setup_teardown (tss2_tcti_call_receive_test,
+        unit_test_setup_teardown (tss2_tcti_call_receive_success_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_receive_sgx_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_receive_tcti_fail_test,
+                                  tss2_tcti_struct_setup,
+                                  tss2_tcti_struct_teardown),
+        unit_test_setup_teardown (tss2_tcti_call_receive_bad_sequence_test,
                                   tss2_tcti_struct_setup,
                                   tss2_tcti_struct_teardown),
         unit_test_setup_teardown (tss2_tcti_call_cancel_test,

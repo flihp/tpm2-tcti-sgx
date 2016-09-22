@@ -37,9 +37,13 @@ __wrap_tss2_tcti_sgx_transmit_ocall (TSS2_RC         *retval,
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_receive_ocall (uint64_t *retval)
+__wrap_tss2_tcti_sgx_receive_ocall (TSS2_RC   *retval,
+                                    uint64_t   id,
+                                    sized_buf *buf,
+                                    uint32_t   timeout)
 {
-    return SGX_SUCCESS;
+    *retval = (TSS2_RC)mock ();
+    return (sgx_status_t)mock ();
 }
 
 void
