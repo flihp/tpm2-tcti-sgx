@@ -31,7 +31,6 @@ CMOCKA_WRAPS = -Wl,--wrap=tss2_tcti_sgx_init_ocall \
     -Wl,--wrap=tss2_tcti_sgx_receive_ocall \
     -Wl,--wrap=tss2_tcti_sgx_finalize_ocall \
     -Wl,--wrap=tss2_tcti_sgx_cancel_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_get_poll_handles_ocall \
     -Wl,--wrap=tss2_tcti_sgx_set_locality_ocall
 
 # enclave library

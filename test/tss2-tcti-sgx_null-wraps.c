@@ -59,12 +59,6 @@ __wrap_tss2_tcti_sgx_cancel_ocall (TSS2_RC  *retval,
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_get_poll_handles_ocall (uint64_t *retval)
-{
-    return SGX_SUCCESS;
-}
-
-sgx_status_t
 __wrap_tss2_tcti_sgx_set_locality_ocall (TSS2_RC   *retval,
                                          uint64_t   id,
                                          uint8_t    locality)
