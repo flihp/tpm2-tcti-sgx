@@ -1,7 +1,6 @@
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
-@CODE_COVERAGE_RULES@
 AM_CFLAGS = $(SAPI_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
     src/tss2_tcti_sgx_t.h \
@@ -32,6 +31,12 @@ CMOCKA_WRAPS = -Wl,--wrap=tss2_tcti_sgx_init_ocall \
     -Wl,--wrap=tss2_tcti_sgx_finalize_ocall \
     -Wl,--wrap=tss2_tcti_sgx_cancel_ocall \
     -Wl,--wrap=tss2_tcti_sgx_set_locality_ocall
+
+# code covear
+@CODE_COVERAGE_RULES@
+CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
+   "$(abs_top_srcdir)/src/tss2_tcti_sgx_t.*" \
+   "$(abs_top_srcdir)/src/tss2_tcti_sgx_u.*"
 
 # enclave library
 src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
