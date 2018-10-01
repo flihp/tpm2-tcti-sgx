@@ -34,3 +34,4 @@ src/tss2_tcti_sgx_u.*
 test/tss2-tcti-sgx-call-tests
 test/tss2-tcti-sgx-init-param-tests
 test/tss2-tcti-sgx-struct-tests
+VERSION

@@ -1,9 +1,4 @@
-m4_define([major_version], [0])
-m4_define([minor_version], [1])
-m4_define([version_string],
-          [major_version.minor_version])
-
-AC_INIT([tss2-tcti-sgx], [version_string])
+AC_INIT([tpm2-tcti-sgx], [m4_esyscmd_s([cat ./VERSION])])
 AC_PROG_CC
 LT_INIT
 AM_INIT_AUTOMAKE([subdir-objects])
