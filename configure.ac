@@ -26,5 +26,13 @@ AC_ARG_ENABLE([sim],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-sim]) ;;
 esac],[sim=true])
 AM_CONDITIONAL([SGX_MODE_SIM], [test x$sim = xtrue])
+# Location of SGX SDK directory. This requires special handling because it
+# disregards many GNU Make / Linux conventions.
+AC_ARG_WITH([sgxsdkdir],
+            AS_HELP_STRING([--with-sgxsdkdir],
+                           [Path to SGX SDK]),
+            [with_sgxsdkdir=$withval],
+            [with_sgxsdkdir=/opt/intel/sgxsdk])
+AC_SUBST([SGX_SDK],[$with_sgxsdkdir])
 
 AC_OUTPUT
