@@ -17,9 +17,8 @@
 TSS2_RC
 tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
                         size_t             size,
-                        uint8_t           *command)
+                        uint8_t const     *command)
 {
-    sized_buf buf = { size, command };
     sgx_status_t status;
     TSS2_RC retval;
 
@@ -28,7 +27,8 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
 
     status = tss2_tcti_sgx_transmit_ocall (&retval,
                                            TSS2_TCTI_SGX_ID (tcti_context),
-                                           &buf);
+                                           size,
+                                           command);
     /**
      * Map SGX error codes to TSS2_RC error codes. If no SGX error return
      * the 'retval' parameter that contains the TSS2_RC value from outside
@@ -57,7 +57,6 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
                        uint8_t           *response,
                        int32_t            timeout)
 {
-    sized_buf buf = { *size, response };
     sgx_status_t status;
     TSS2_RC retval;
 
@@ -66,7 +65,8 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
 
     status = tss2_tcti_sgx_receive_ocall (&retval,
                                           TSS2_TCTI_SGX_ID (tcti_context),
-                                          &buf,
+                                          *size,
+                                          response,
                                           timeout);
     if (status == SGX_SUCCESS)
         return retval;

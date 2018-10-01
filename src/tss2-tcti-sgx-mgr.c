@@ -93,7 +93,8 @@ tss2_tcti_sgx_init_ocall ()
 
 TSS2_RC
 tss2_tcti_sgx_transmit_ocall (uint64_t         id,
-                              const sized_buf *sz_buf)
+                              size_t           size,
+                              const uint8_t   *command)
 {
     tss2_tcti_sgx_session_t *session;
     TSS2_RC ret;
@@ -105,8 +106,8 @@ tss2_tcti_sgx_transmit_ocall (uint64_t         id,
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
     ret = Tss2_Tcti_Transmit (session->tcti_context,
-                              sz_buf->size,
-                              sz_buf->buf);
+                              size,
+                              command);
     g_mutex_unlock (session->mutex);
     return ret;
 }
@@ -114,7 +115,8 @@ tss2_tcti_sgx_transmit_ocall (uint64_t         id,
 TSS2_RC
 tss2_tcti_sgx_receive_ocall (uint64_t   id,
                              size_t     size,
-                             const sized_buf *sz_buf)
+                             uint8_t   *response,
+                             uint32_t   timeout)
 {
     tss2_tcti_sgx_session_t *session;
     TSS2_RC ret;
@@ -130,8 +132,8 @@ tss2_tcti_sgx_receive_ocall (uint64_t   id,
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
     ret = Tss2_Tcti_Receive (session->tcti_context,
-                             sz_buf->size,
-                             sz_buf->buf,
+                             &size,
+                             response,
                              timeout);
     g_mutex_unlock (session->mutex);
 

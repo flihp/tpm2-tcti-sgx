@@ -16,10 +16,12 @@ enclave {
         tss2_tcti_sgx_init_ocall       (void);
         TSS2_RC
         tss2_tcti_sgx_transmit_ocall   (uint64_t   session_id,
-                                        [in, sizefunc=sizeof_sized_buf] const sized_buf *buf);
+                                        size_t     size,
+                                        [in, size=size] const uint8_t *command);
         TSS2_RC
         tss2_tcti_sgx_receive_ocall    (uint64_t  session_id,
-                                        [in, out, sizefunc=sizeof_sized_buf] sized_buf *buf,
+                                        size_t    size,
+                                        [in, out, size=size] uint8_t *response,
                                         uint32_t  timeout);
         void
         tss2_tcti_sgx_finalize_ocall   (uint64_t  session_id);
