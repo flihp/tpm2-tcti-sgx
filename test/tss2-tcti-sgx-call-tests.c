@@ -5,7 +5,6 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <tpm20.h>
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
 #include "tss2-tcti-sgx-common.h"

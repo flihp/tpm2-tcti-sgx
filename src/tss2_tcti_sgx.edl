@@ -1,5 +1,5 @@
 enclave {
-    include "tss2/tpm20.h"
+    include "tss2/tss2_tpm2_types.h"
 
     struct sized_buf {
         size_t size;

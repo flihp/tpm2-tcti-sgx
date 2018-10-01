@@ -4,7 +4,9 @@
 #include <cmocka.h>
 
 #include <sgx_error.h>
-#include <tss2/tpm20.h>
+
+#include <tss2/tss2_tpm2_types.h>
+
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
 

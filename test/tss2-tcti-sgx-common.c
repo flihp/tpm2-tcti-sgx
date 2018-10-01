@@ -4,7 +4,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <tss2/tpm20.h>
+#include <tss2/tss2_tpm2_types.h>
+
 #include <tss2-tcti-sgx.h>
 #include "tss2-tcti-sgx_priv.h"
 #include "tss2-tcti-sgx-common.h"
@@ -46,7 +47,7 @@ tss2_tcti_struct_teardown (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
 
-    tss2_tcti_finalize (context);
+    Tss2_Tcti_Finalize (context);
     if (context)
         free (context);
 }

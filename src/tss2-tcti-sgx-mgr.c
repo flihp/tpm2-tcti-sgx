@@ -2,7 +2,8 @@
 #include <fcntl.h>
 #include <glib.h>
 #include <stdio.h>
-#include <tss2/tpm20.h>
+
+#include <tss2/tss2_tcti.h>
 #include "tss2_tcti_sgx_u.h"
 
 #define RAND_SRC "/dev/urandom"
@@ -102,7 +103,7 @@ tss2_tcti_sgx_transmit_ocall (uint64_t         id,
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
-    ret = tss2_tcti_transmit (session->tcti_context,
+    ret = Tss2_Tcti_Transmit (session->tcti_context,
                               sz_buf->size,
                               sz_buf->buf);
     g_mutex_unlock (session->mutex);
@@ -111,8 +112,8 @@ tss2_tcti_sgx_transmit_ocall (uint64_t         id,
 
 TSS2_RC
 tss2_tcti_sgx_receive_ocall (uint64_t   id,
-                             sized_buf *sz_buf,
-                             uint32_t   timeout)
+                             size_t     size,
+                             const sized_buf *sz_buf)
 {
     tss2_tcti_sgx_session_t *session;
     TSS2_RC ret;
@@ -127,8 +128,8 @@ tss2_tcti_sgx_receive_ocall (uint64_t   id,
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
-    ret = tss2_tcti_receive (session->tcti_context,
-                             &sz_buf->size,
+    ret = Tss2_Tcti_Receive (session->tcti_context,
+                             sz_buf->size,
                              sz_buf->buf,
                              timeout);
     g_mutex_unlock (session->mutex);
@@ -147,7 +148,7 @@ tss2_tcti_sgx_finalize_ocall (uint64_t id)
     if (session == NULL)
         return;
     g_mutex_lock (session->mutex);
-    tss2_tcti_finalize (session->tcti_context);
+    Tss2_Tcti_Finalize (session->tcti_context);
     g_mutex_unlock (session->mutex);
 }
 
@@ -163,7 +164,7 @@ tss2_tcti_sgx_cancel_ocall (uint64_t id)
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
-    ret = tss2_tcti_cancel (session->tcti_context);
+    ret = Tss2_Tcti_Cancel (session->tcti_context);
     g_mutex_unlock (session->mutex);
     return ret;
 }
@@ -189,7 +190,7 @@ tss2_tcti_sgx_set_locality_ocall (uint64_t id,
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
-    ret = tss2_tcti_set_locality (session->tcti_context, locality);
+    ret = Tss2_Tcti_SetLocality (session->tcti_context, locality);
     g_mutex_unlock (session->mutex);
     return ret;
 }

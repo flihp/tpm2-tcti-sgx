@@ -44,7 +44,7 @@ typedef struct {
 
 TSS2_RC    tss2_tcti_sgx_transmit         (TSS2_TCTI_CONTEXT     *tcti_context,
                                            size_t                 size,
-                                           uint8_t               *command);
+                                           uint8_t const         *command);
 TSS2_RC    tss2_tcti_sgx_receive          (TSS2_TCTI_CONTEXT     *tcti_context,
                                            size_t                *size,
                                            uint8_t               *response,
