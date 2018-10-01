@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_FILES([Makefile])
 PKG_CHECK_MODULES([CMOCKA],[cmocka])
 PKG_CHECK_MODULES([GLIB],[glib-2.0])
-PKG_CHECK_MODULES([SAPI],[sapi])
+PKG_CHECK_MODULES([TSS2_SYS],[tss2-sys >= 2.0])
 AX_CODE_COVERAGE
 # get sizeof void pointer, define variable to let Makefile.am know
 AC_CHECK_SIZEOF([void*])
