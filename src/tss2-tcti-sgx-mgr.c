@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <glib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include <tss2/tss2_tcti.h>
 #include "tss2_tcti_sgx_u.h"

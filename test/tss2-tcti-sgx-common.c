@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <sgx_error.h>
 
 #include <setjmp.h>
