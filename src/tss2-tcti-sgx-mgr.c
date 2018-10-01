@@ -69,14 +69,14 @@ tss2_tcti_sgx_init_ocall ()
         g_error ("failed to open %s: %s", RAND_SRC, strerror (errno));
     session = calloc (1, sizeof (tss2_tcti_sgx_session_t));
     if (session == NULL)
-        gerror ("failed to allocate memory for session structure: %s",
-                strerror (errno));
+        g_error ("failed to allocate memory for session structure: %s",
+                 strerror (errno));
     g_mutex_lock (mgr_global->session_table_mutex);
     if (read (fd, &session->id, sizeof (session->id)) != sizeof (session->id))
-        gerror ("failed to read %d bytes from %s: %s",
-                sizeof (session->id),
-                RAND_SRC,
-                strerror (errno));
+        g_error ("failed to read %d bytes from %s: %s",
+                 sizeof (session->id),
+                 RAND_SRC,
+                 strerror (errno));
     session->tcti_context = mgr_global->init_cb (mgr_global->user_data);
     if (session->tcti_context == NULL)
         g_error ("tcti init callback failed to create a TCTI");
