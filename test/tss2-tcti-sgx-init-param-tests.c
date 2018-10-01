@@ -69,11 +69,11 @@ tss2_tcti_sgx_init_success_mock_ocall (void **state)
 int
 main(int argc, char* argv[])
 {
-    const UnitTest tests[] = {
-        unit_test(tss2_tcti_sgx_init_size_test),
-        unit_test(tss2_tcti_sgx_init_success_return_value_test),
-        unit_test(tss2_tcti_sgx_init_allnull_is_bad_value),
-        unit_test(tss2_tcti_sgx_init_success_mock_ocall),
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test (tss2_tcti_sgx_init_size_test),
+        cmocka_unit_test (tss2_tcti_sgx_init_success_return_value_test),
+        cmocka_unit_test (tss2_tcti_sgx_init_allnull_is_bad_value),
+        cmocka_unit_test (tss2_tcti_sgx_init_success_mock_ocall),
     };
-    return run_tests(tests);
+    return cmocka_run_group_tests(tests, NULL, NULL);
 }

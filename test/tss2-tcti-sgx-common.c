@@ -11,7 +11,7 @@
 #include "tss2-tcti-sgx_priv.h"
 #include "tss2-tcti-sgx-common.h"
 
-void
+int
 tss2_tcti_struct_setup (void **state)
 {
     TSS2_TCTI_CONTEXT *context = NULL;
@@ -21,12 +21,12 @@ tss2_tcti_struct_setup (void **state)
     ret = tss2_tcti_sgx_init (NULL, &tcti_size);
     if (ret != TSS2_RC_SUCCESS) {
         printf ("tss2_tcti_sgx_init failed: %d\n", ret);
-        return;
+        return 1;
     }
     context = calloc (1, tcti_size);
     if (context == NULL) {
         perror ("calloc");
-        return;
+        return 1;
     }
     /**
      * prime data for mock ocall:
@@ -38,12 +38,13 @@ tss2_tcti_struct_setup (void **state)
     ret = tss2_tcti_sgx_init (context, 0);
     if (ret != TSS2_RC_SUCCESS) {
         printf ("tss2_tcti_sgx_init failed: %d\n", ret);
-        return;
+        return 1;
     }
     *state = context;
+    return 0;
 }
 
-void
+int
 tss2_tcti_struct_teardown (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
@@ -51,4 +52,5 @@ tss2_tcti_struct_teardown (void **state)
     Tss2_Tcti_Finalize (context);
     if (context)
         free (context);
+    return 0;
 }
