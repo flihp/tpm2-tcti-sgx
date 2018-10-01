@@ -1,4 +1,8 @@
-AC_INIT([tpm2-tcti-sgx], [m4_esyscmd_s([cat ./VERSION])])
+AC_INIT([tpm2-tcti-sgx],
+        [m4_esyscmd_s([cat ./VERSION])],
+        [https://example.org/tpm2-tcti-sgx/bugs],
+        [],
+        [https://example.org/tpm2-tcti-sgx])
 AC_PROG_CC
 LT_INIT
 AM_INIT_AUTOMAKE([subdir-objects])
