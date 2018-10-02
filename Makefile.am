@@ -3,7 +3,7 @@
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(TSS2_SYS_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/include -I$(srcdir)/src/include -fPIC
+AM_CFLAGS = $(TSS2_SYS_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
     src/tss2_tcti_sgx_t.h \
     src/tss2_tcti_sgx_t.c \
@@ -26,7 +26,7 @@ TESTS = $(check_PROGRAMS)
 # headers and where to install them
 libtss2_tctidir      = $(includedir)/tss2
 libtss2_tcti_HEADERS = \
-    $(srcdir)/include/tss2-tcti-sgx.h \
+    $(srcdir)/src/include/tss2-tcti-sgx.h \
     $(srcdir)/src/include/tss2-tcti-sgx-mgr.h
 
 EXTRA_DIST = \
