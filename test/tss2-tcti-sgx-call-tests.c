@@ -201,7 +201,7 @@ tss2_tcti_call_cancel_sgx_fail_test (void **state)
     TSS2_RC rc;
 
     will_return (__wrap_tss2_tcti_sgx_cancel_ocall, TSS2_RC_SUCCESS);
-    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, SGX_ERROR_HYPERV_ENABLED);
+    will_return (__wrap_tss2_tcti_sgx_cancel_ocall, SGX_ERROR_UNEXPECTED);
 
     TSS2_TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
     rc = tss2_tcti_sgx_cancel (context);
