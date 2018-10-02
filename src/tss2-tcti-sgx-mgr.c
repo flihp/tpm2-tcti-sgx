@@ -9,25 +9,11 @@
 #include <unistd.h>
 
 #include <tss2/tss2_tcti.h>
+
 #include "tss2_tcti_sgx_u.h"
+#include "tss2-tcti-sgx-mgr.h"
 
 #define RAND_SRC "/dev/urandom"
-
-/* callback to initialize new TCTI */
-typedef TSS2_TCTI_CONTEXT* (*downstream_tcti_init_cb) (void *user_data);
-
-typedef struct tss2_tcti_sgx_mgr {
-    downstream_tcti_init_cb  init_cb;
-    gpointer                 user_data;
-    GHashTable              *session_table;
-    GMutex                  *session_table_mutex;
-} tss2_tcti_sgx_mgr_t;
-
-typedef struct tss2_tcti_sgx_session {
-    uint64_t           id;
-    TSS2_TCTI_CONTEXT *tcti_context;
-    GMutex            *mutex;
-} tss2_tcti_sgx_session_t;
 
 /* Global mgr variable with file scope.
  * We use this like a singleton since we have to respond to

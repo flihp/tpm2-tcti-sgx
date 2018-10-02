@@ -24,8 +24,10 @@ check_PROGRAMS  = \
 TESTS = $(check_PROGRAMS)
 
 # headers and where to install them
-libtss2_tcti_sgxdir      = $(includedir)
-libtss2_tcti_sgx_HEADERS = $(srcdir)/include/tss2-tcti-sgx.h
+libtss2_tctidir      = $(includedir)/tss2
+libtss2_tcti_HEADERS = \
+    $(srcdir)/include/tss2-tcti-sgx.h \
+    $(srcdir)/src/include/tss2-tcti-sgx-mgr.h
 
 EXTRA_DIST = \
     src/include/tss2-tcti-sgx_priv.h \
