@@ -25,6 +25,12 @@ TESTS = $(check_PROGRAMS)
 libtss2_tcti_sgxdir      = $(includedir)
 libtss2_tcti_sgx_HEADERS = $(srcdir)/include/tss2-tcti-sgx.h
 
+EXTRA_DIST = \
+    src/include/tss2-tcti-sgx_priv.h \
+    src/tss2_tcti_sgx.edl \
+    test/tss2-tcti-sgx-common.h \
+    VERSION
+
 CMOCKA_WRAPS = -Wl,--wrap=tss2_tcti_sgx_init_ocall \
     -Wl,--wrap=tss2_tcti_sgx_transmit_ocall \
     -Wl,--wrap=tss2_tcti_sgx_receive_ocall \
@@ -43,15 +49,16 @@ src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined \
     -Wl,--version-script=src/tss2-tcti-sgx.map
 src_libtss2_tcti_sgx_la_LDLIBS  = $(ENCLAVE_LDLIBS)
-src_libtss2_tcti_sgx_la_SOURCES = src/tss2-tcti-sgx.c src/tss2-tcti-sgx.map \
-    src/tss2_tcti_sgx_t.c src/tss2_tcti_sgx_t.h
+src_libtss2_tcti_sgx_la_SOURCES = src/tss2-tcti-sgx.c src/tss2-tcti-sgx.map
+nodist_src_libtss2_tcti_sgx_la_SOURCES = src/tss2_tcti_sgx_t.c
 
 # application library
 src_libtss2_tcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
 src_libtss2_tcti_sgx_mgr_la_LDFLAGS = -Wl,--version-script=src/tss2-tcti-sgx-mgr.map
 src_libtss2_tcti_sgx_mgr_la_LDLIBS  = $(GLIB_LIBS)
 src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2-tcti-sgx-mgr.c \
-    src/tss2-tcti-sgx-mgr.map src/tss2_tcti_sgx_u.c
+    src/tss2-tcti-sgx-mgr.map
+nodist_src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2_tcti_sgx_u.c
 
 # unit tests
 test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
