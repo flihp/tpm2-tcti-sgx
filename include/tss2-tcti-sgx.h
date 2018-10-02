@@ -1,3 +1,7 @@
+/*
+ * Copyright 2016 - 2018, Intel Corporation
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #ifndef TSS2_TCTI_SGX
 #define TSS2_TCTI_SGX
 

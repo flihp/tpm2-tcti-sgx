@@ -1,3 +1,7 @@
+/*
+ * Copyright 2016 - 2018, Intel Corporation
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <sgx_error.h>

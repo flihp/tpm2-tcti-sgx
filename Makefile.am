@@ -1,3 +1,5 @@
+# Copyright 2016 - 2018, Intel Corporation
+# SPDX-License-Identifier: BSD-2-Clause
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4

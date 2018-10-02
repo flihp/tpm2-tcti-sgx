@@ -1,3 +1,5 @@
+# Copyright 2016 - 2018, Intel Corporation
+# SPDX-License-Identifier: BSD-2-Clause
 AC_INIT([tpm2-tcti-sgx],
         [m4_esyscmd_s([cat ./VERSION])],
         [https://example.org/tpm2-tcti-sgx/bugs],

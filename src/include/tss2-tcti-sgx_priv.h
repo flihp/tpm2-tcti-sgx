@@ -1,8 +1,13 @@
+/*
+ * Copyright 2016 - 2018, Intel Corporation
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 #ifndef TSS2_TCTI_SGX_PRIV_H
 #define TSS2_TCTI_SGX_PRIV_H
 
 /* generate your own:
  * cat /dev/random | tr -dc 'a-f0-9' | fold -w 16 | head -n 1
+ *
  */
 #define TSS2_TCTI_SGX_MAGIC 0x4e50bc1dcdb7623c
 #define TSS2_TCTI_SGX_ID(context) \

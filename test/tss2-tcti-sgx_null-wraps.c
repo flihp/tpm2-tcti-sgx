@@ -1,3 +1,7 @@
+/*
+ * Copyright 2016 - 2018, Intel Corporation
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
 /* These are all mock implementations of the ocalls made by the
  * tss2-tcti-sgx library. Mocks of these are necessary for all cmocka tests
  * that instantiate the SGX TCTI. Your cmocka tests may want to implement
