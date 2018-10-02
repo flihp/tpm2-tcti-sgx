@@ -5,11 +5,6 @@
  enclave {
     include "tss2/tss2_tpm2_types.h"
 
-    struct sized_buf {
-        size_t size;
-        uint8_t *buf;
-    };
-
     trusted {
         public int tss2_tcti_sgx_init_ecall (void);
         public int tss2_tcti_sgx_finalize_ecall (void);

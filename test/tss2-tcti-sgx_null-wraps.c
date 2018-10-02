@@ -34,7 +34,8 @@ __wrap_tss2_tcti_sgx_init_ocall (uint64_t *retval)
 sgx_status_t
 __wrap_tss2_tcti_sgx_transmit_ocall (TSS2_RC         *retval,
                                      uint64_t         id,
-                                     sized_buf const *buf)
+                                     size_t           size,
+                                     const uint8_t*   command)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
@@ -43,7 +44,8 @@ __wrap_tss2_tcti_sgx_transmit_ocall (TSS2_RC         *retval,
 sgx_status_t
 __wrap_tss2_tcti_sgx_receive_ocall (TSS2_RC   *retval,
                                     uint64_t   id,
-                                    sized_buf *buf,
+                                    size_t     size,
+                                    uint8_t   *response,
                                     uint32_t   timeout)
 {
     *retval = (TSS2_RC)mock ();
