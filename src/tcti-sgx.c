@@ -7,7 +7,7 @@
 #include "tcti-sgx_priv.h"
 #include "tcti_sgx_t.h"
 
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * transmit function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -34,7 +34,7 @@ tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
                                       TCTI_SGX_ID (tcti_context),
                                       size,
                                       command);
-    /**
+    /*
      * Map SGX error codes to TSS2_RC error codes. If no SGX error return
      * the 'retval' parameter that contains the TSS2_RC value from outside
      * the enclave.
@@ -44,7 +44,7 @@ tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
     else
         return TSS2_TCTI_RC_GENERAL_FAILURE;
 }
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * receive function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -78,7 +78,7 @@ tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
     else
         return TSS2_TCTI_RC_GENERAL_FAILURE;
 }
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * finalize function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -98,7 +98,7 @@ tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 
     status = tcti_sgx_finalize_ocall (TCTI_SGX_ID (tcti_context));
 }
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * cancel function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -126,7 +126,7 @@ tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
     else
         return TSS2_TCTI_RC_GENERAL_FAILURE;
 }
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * getPollHandles function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -149,7 +149,7 @@ tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT *tcti_context,
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
-/**
+/*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * setLocality function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
@@ -180,7 +180,7 @@ tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
     else
         return TSS2_TCTI_RC_GENERAL_FAILURE;
 }
-/**
+/*
  * This is the initialization function for the SGX TCTI. It inplements a
  * protocol similar to the TSS SAPI that enables the user to obtain the
  * size of the context required by the TCTI using the following algorithm:
@@ -227,7 +227,7 @@ Tss2_Tcti_Sgx_Init (TSS2_TCTI_CONTEXT *tcti_context,
     status = tcti_sgx_init_ocall (&TCTI_SGX_ID (tcti_context));
     if (status != SGX_SUCCESS)
         return TSS2_TCTI_RC_GENERAL_FAILURE;
-    /**
+    /*
      * Only set state to READY_TO_TRANSMIT after ocall to initialize
      * connection completes successfully
      */

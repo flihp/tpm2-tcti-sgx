@@ -15,7 +15,8 @@
 #include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
 
-/* when given an NULL context and a pointer to a size_t, set the size_t
+/*
+ * when given an NULL context and a pointer to a size_t, set the size_t
  * parameter to the size of the TSS2_TCTI_CONTEXT_SGX structure.
  */
 static void
@@ -26,7 +27,8 @@ tcti_sgx_init_size_test (void **state)
     Tss2_Tcti_Sgx_Init (NULL, &tcti_size);
     assert_int_equal (tcti_size, sizeof (TCTI_CONTEXT_SGX));
 }
-/* when given a NULL context and a pointer to size_t, the init function
+/*
+ * when given a NULL context and a pointer to size_t, the init function
  * returns TSS2_RC_SUCCESS
  */
 static void
@@ -38,7 +40,8 @@ tcti_sgx_init_success_return_value_test (void **state)
     ret = Tss2_Tcti_Sgx_Init (NULL, &tcti_size);
     assert_int_equal (ret, TSS2_RC_SUCCESS);
 }
-/* when given NULL pointers for both parameters the init function returns
+/*
+ * when given NULL pointers for both parameters the init function returns
  * an error indicating that the values are bad (TSS2_TCTI_RC_BAD_VALUE)
  */
 static void
@@ -49,7 +52,7 @@ tcti_sgx_init_allnull_is_bad_value (void **state)
     ret = Tss2_Tcti_Sgx_Init (NULL, NULL);
     assert_int_equal (ret, TSS2_TCTI_RC_BAD_VALUE);
 }
-/**
+/*
  * When given a non-NULL context the init function should set up various
  * bits of data in the context structure and return a success indicator.
  * This requires an ocall to register the context with the RM/TAB in the

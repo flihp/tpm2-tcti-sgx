@@ -15,15 +15,35 @@
 
 #define RAND_SRC "/dev/urandom"
 
-/* Global mgr variable with file scope.
+/*
+ * This code module contains the logic that we need to process 'ocalls'
+ * from the enclave (enclaves?) using the SGX TCTI. The functions in the
+ * TCTI that are envoked by the TSS2 result in the enclave interacting with
+ * the outside world (where the TPM lives) via these 'ocalls'. Code in this
+ * module reacts and responds to these ocalls.
+ */
+/*
+ * Global mgr variable with file scope.
  * We use this like a singleton since we have to respond to
- * tcti_sgx_init_ocall by creating a new session and adding it to the mgr
- * but we can't have the enclave pass us a reference to the mgr (I don't
- * think). This is a less desirable option.
+ * tcti_sgx_init_ocall by creating a new session and adding it to the mgr.
+ * The hard part is passing a reference to this structure into the
+ * tcti_sgx_init_ocall function. We must provide an implementation of this
+ * function @ compile time and it's only ever envoked by enclave code so
+ * we can't pass in any data from the aplication via parameters. So we fall
+ * back on using global with singleton-ish semantics.
+ *
+ * The data in this structure should be treated as 'readonly' after
+ * initialization with the exception of the GHashTable we use to track
+ * connections from within the enclave. When interacting with this variable
+ * the caller MUST hold the 'session_table_mutex'.
  */
 static tcti_sgx_mgr_t *mgr_global = NULL;
 
-/* function to initialize the application / untrusted library
+/*
+ * Function to initialize the application / untrusted library. The 'callback'
+ * parameter is a caller provided function used to initialize a TCTI
+ * instance used to communicate with the 'downstream' TPM. This allows for
+ * flexible configuration by the application hosting the enclave.
  */
 tcti_sgx_mgr_t*
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
@@ -44,7 +64,8 @@ out:
     return mgr_global;
 }
 
-/* function called by enclave to initialize new TCTI connection
+/*
+ * function called by enclave to initialize new TCTI connection
  */
 uint64_t
 tcti_sgx_init_ocall ()

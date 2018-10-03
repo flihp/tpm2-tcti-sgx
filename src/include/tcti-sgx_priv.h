@@ -5,15 +5,15 @@
 #ifndef TSS2_TCTI_SGX_PRIV_H
 #define TSS2_TCTI_SGX_PRIV_H
 
-/* generate your own:
+/*
+ * generate your own:
  * cat /dev/random | tr -dc 'a-f0-9' | fold -w 16 | head -n 1
- *
  */
 #define TCTI_SGX_MAGIC 0x4e50bc1dcdb7623c
 #define TCTI_SGX_ID(context) ((TCTI_CONTEXT_SGX*)context)->id
 #define TCTI_SGX_STATE(context) ((TCTI_CONTEXT_SGX*)context)->state
 
-/**
+/*
  * There is a small state machine maintained by this TCTI. It is used to
  * prevent callers from making nonsensical function calls like trying to
  * call the receive function before calling transmit.
@@ -33,7 +33,8 @@ typedef enum {
     READY_TO_TRANSMIT,
 } tcti_sgx_state_t;
 
-/* This is our private TCTI structure. We're required by the spec to have
+/*
+ * This is our private TCTI structure. We're required by the spec to have
  * the same structure as the non-opaque area defined by the
  * TSS2_TCTI_CONTEXT_COMMON_V1 structure. Anything after this data is opaque
  * and private to our implementation. See section 7.3 of the SAPI / TCTI spec

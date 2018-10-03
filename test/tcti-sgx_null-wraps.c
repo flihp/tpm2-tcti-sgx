@@ -18,7 +18,7 @@
 
 #include "tcti_sgx_t.h"
 
-/**
+/*
  * This is a mock function for the initialization OCall.
  * Instead of actually calling out to the external RM/TAB
  * initialization function we pop a value off of the cmocka

@@ -32,7 +32,7 @@ tcti_struct_setup (void **state)
         perror ("calloc");
         return 1;
     }
-    /**
+    /*
      * prime data for mock ocall:
      *   OCall returns an ID of 1
      *   OCall return value indicates success
