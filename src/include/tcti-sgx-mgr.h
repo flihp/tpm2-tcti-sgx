@@ -5,6 +5,12 @@
 #ifndef TCTI_SGX_MGR_H
 #define TCTI_SGX_MGR_H
 
+#include <glib.h>
+#include <stdint.h>
+
+#include <tss2/tss2_tpm2_types.h>
+#include <tss2/tss2_tcti.h>
+
 typedef TSS2_TCTI_CONTEXT* (*downstream_tcti_init_cb) (void *user_data);
 
 typedef struct tcti_sgx_mgr {
