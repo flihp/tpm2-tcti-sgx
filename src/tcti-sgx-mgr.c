@@ -10,28 +10,28 @@
 
 #include <tss2/tss2_tcti.h>
 
-#include "tss2_tcti_sgx_u.h"
-#include "tss2-tcti-sgx-mgr.h"
+#include "tcti-sgx-mgr.h"
+#include "tcti_sgx_u.h"
 
 #define RAND_SRC "/dev/urandom"
 
 /* Global mgr variable with file scope.
  * We use this like a singleton since we have to respond to
- * tss2_tcti_sgx_init_ocall by creating a new session and adding it to the mgr
+ * tcti_sgx_init_ocall by creating a new session and adding it to the mgr
  * but we can't have the enclave pass us a reference to the mgr (I don't
  * think). This is a less desirable option.
  */
-static tss2_tcti_sgx_mgr_t *mgr_global = NULL;
+static tcti_sgx_mgr_t *mgr_global = NULL;
 
 /* function to initialize the application / untrusted library
  */
-tss2_tcti_sgx_mgr_t*
-tss2_tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
-                        gpointer                user_data)
+tcti_sgx_mgr_t*
+tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
+                   gpointer user_data)
 {
     if (mgr_global != NULL)
-        g_error ("tss2_tcti_sgx_mgr already initialized");
-    mgr_global = calloc (1, sizeof (tss2_tcti_sgx_mgr_t));
+        g_error ("%s: already initialized", __func__);
+    mgr_global = calloc (1, sizeof (tcti_sgx_mgr_t));
     if (mgr_global == NULL) {
         perror ("calloc");
         goto out;
@@ -47,18 +47,18 @@ out:
 /* function called by enclave to initialize new TCTI connection
  */
 uint64_t
-tss2_tcti_sgx_init_ocall ()
+tcti_sgx_init_ocall ()
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
     gint fd;
     gboolean insert_result;
 
     if (mgr_global == NULL)
-        g_error ("tss2_tcti_sgx_mgr not initialized");
+        g_error ("%s: tcti_sgx_mgr not initialized", __func__);
     fd = open (RAND_SRC, O_RDONLY);
     if (fd == -1)
         g_error ("failed to open %s: %s", RAND_SRC, strerror (errno));
-    session = calloc (1, sizeof (tss2_tcti_sgx_session_t));
+    session = calloc (1, sizeof (tcti_sgx_session_t));
     if (session == NULL)
         g_error ("failed to allocate memory for session structure: %s",
                  strerror (errno));
@@ -82,11 +82,11 @@ tss2_tcti_sgx_init_ocall ()
 }
 
 TSS2_RC
-tss2_tcti_sgx_transmit_ocall (uint64_t         id,
-                              size_t           size,
-                              const uint8_t   *command)
+tcti_sgx_transmit_ocall (uint64_t id,
+                         size_t size,
+                         const uint8_t *command)
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
     TSS2_RC ret;
 
     g_mutex_lock (mgr_global->session_table_mutex);
@@ -103,12 +103,12 @@ tss2_tcti_sgx_transmit_ocall (uint64_t         id,
 }
 
 TSS2_RC
-tss2_tcti_sgx_receive_ocall (uint64_t   id,
-                             size_t     size,
-                             uint8_t   *response,
-                             uint32_t   timeout)
+tcti_sgx_receive_ocall (uint64_t id,
+                        size_t size,
+                        uint8_t *response,
+                        uint32_t timeout)
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
     TSS2_RC ret;
 
     /* we only support blocking calls currently */
@@ -131,9 +131,9 @@ tss2_tcti_sgx_receive_ocall (uint64_t   id,
 }
 
 void
-tss2_tcti_sgx_finalize_ocall (uint64_t id)
+tcti_sgx_finalize_ocall (uint64_t id)
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
 
     g_mutex_lock (mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
@@ -146,9 +146,9 @@ tss2_tcti_sgx_finalize_ocall (uint64_t id)
 }
 
 TSS2_RC
-tss2_tcti_sgx_cancel_ocall (uint64_t id)
+tcti_sgx_cancel_ocall (uint64_t id)
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
     TSS2_RC ret;
 
     g_mutex_lock (mgr_global->session_table_mutex);
@@ -163,18 +163,18 @@ tss2_tcti_sgx_cancel_ocall (uint64_t id)
 }
 
 TSS2_RC
-tss2_tcti_sgx_get_poll_handles (uint64_t               id,
-                                TSS2_TCTI_POLL_HANDLE *handles,
-                                size_t                *num_handles)
+tcti_sgx_get_poll_handles (uint64_t id,
+                           TSS2_TCTI_POLL_HANDLE *handles,
+                           size_t *num_handles)
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 
 TSS2_RC
-tss2_tcti_sgx_set_locality_ocall (uint64_t id,
-                                  uint8_t  locality)
+tcti_sgx_set_locality_ocall (uint64_t id,
+                             uint8_t locality)
 {
-    tss2_tcti_sgx_session_t *session;
+    tcti_sgx_session_t *session;
     TSS2_RC ret;
 
     g_mutex_lock (mgr_global->session_table_mutex);

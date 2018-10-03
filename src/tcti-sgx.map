@@ -1,0 +1,4 @@
+{
+    global: Tss2_Tcti_Sgx_Init;
+    local:  *;
+};

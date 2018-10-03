@@ -5,86 +5,95 @@ include sgx_sdk.mk
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(TSS2_SYS_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
-    src/tss2_tcti_sgx_t.h \
-    src/tss2_tcti_sgx_t.c \
-    src/tss2_tcti_sgx_u.h \
-    src/tss2_tcti_sgx_u.c
+    src/tcti_sgx_t.h \
+    src/tcti_sgx_t.c \
+    src/tcti_sgx_u.h \
+    src/tcti_sgx_u.c
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
 lib_LTLIBRARIES = \
     src/libtss2-tcti-sgx.la \
-    src/libtss2-tcti-sgx-mgr.la
+    src/libtcti-sgx-mgr.la
 
 # connect unit tests to the test harness
 check_PROGRAMS  = \
-    test/tss2-tcti-sgx-init-param-tests \
-    test/tss2-tcti-sgx-struct-tests \
-    test/tss2-tcti-sgx-call-tests
+    test/tcti-sgx-init-param-tests \
+    test/tcti-sgx-struct-tests \
+    test/tcti-sgx-call-tests
 TESTS = $(check_PROGRAMS)
 
 # headers and where to install them
-libtss2_tctidir      = $(includedir)/tss2
-libtss2_tcti_HEADERS = \
-    $(srcdir)/src/include/tss2-tcti-sgx.h \
-    $(srcdir)/src/include/tss2-tcti-sgx-mgr.h
+libtss2_tcti_sgxdir = $(includedir)/tss2
+libtss2_tcti_sgx_HEADERS = $(srcdir)/src/include/tss2-tcti-sgx.h
+
+libtcti_sgx_mgrdir = $(includedir)
+libtcti_sgx_mgr_HEADERS = $(srcdir)/src/include/tcti-sgx-mgr.h
 
 EXTRA_DIST = \
-    src/include/tss2-tcti-sgx_priv.h \
-    src/tss2_tcti_sgx.edl \
-    test/tss2-tcti-sgx-common.h \
+    src/include/tcti-sgx_priv.h \
+    src/tcti_sgx.edl \
+    test/tcti-sgx-common.h \
     VERSION
 
-CMOCKA_WRAPS = -Wl,--wrap=tss2_tcti_sgx_init_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_transmit_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_receive_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_finalize_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_cancel_ocall \
-    -Wl,--wrap=tss2_tcti_sgx_set_locality_ocall
+CMOCKA_WRAPS = \
+    -Wl,--wrap=tcti_sgx_init_ocall \
+    -Wl,--wrap=tcti_sgx_transmit_ocall \
+    -Wl,--wrap=tcti_sgx_receive_ocall \
+    -Wl,--wrap=tcti_sgx_finalize_ocall \
+    -Wl,--wrap=tcti_sgx_cancel_ocall \
+    -Wl,--wrap=tcti_sgx_set_locality_ocall
 
 # code covear
 @CODE_COVERAGE_RULES@
 CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
-   "$(abs_top_srcdir)/src/tss2_tcti_sgx_t.*" \
-   "$(abs_top_srcdir)/src/tss2_tcti_sgx_u.*"
+   "$(abs_top_srcdir)/src/tcti_sgx_t.*" \
+   "$(abs_top_srcdir)/src/tcti_sgx_u.*"
 
 # enclave library
 src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined \
-    -Wl,--version-script=src/tss2-tcti-sgx.map
+    -Wl,--version-script=src/tcti-sgx.map
 src_libtss2_tcti_sgx_la_LDLIBS  = $(ENCLAVE_LDLIBS)
-src_libtss2_tcti_sgx_la_SOURCES = src/tss2-tcti-sgx.c src/tss2-tcti-sgx.map
-nodist_src_libtss2_tcti_sgx_la_SOURCES = src/tss2_tcti_sgx_t.c
+src_libtss2_tcti_sgx_la_SOURCES = src/tcti-sgx.c src/tcti-sgx.map
+nodist_src_libtss2_tcti_sgx_la_SOURCES = src/tcti_sgx_t.c
 
 # application library
-src_libtss2_tcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
-src_libtss2_tcti_sgx_mgr_la_LDFLAGS = -Wl,--version-script=src/tss2-tcti-sgx-mgr.map
-src_libtss2_tcti_sgx_mgr_la_LDLIBS  = $(GLIB_LIBS)
-src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2-tcti-sgx-mgr.c \
-    src/tss2-tcti-sgx-mgr.map
-nodist_src_libtss2_tcti_sgx_mgr_la_SOURCES = src/tss2_tcti_sgx_u.c
+src_libtcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
+src_libtcti_sgx_mgr_la_LDFLAGS = -Wl,--version-script=src/tcti-sgx-mgr.map
+src_libtcti_sgx_mgr_la_LDLIBS  = $(GLIB_LIBS)
+src_libtcti_sgx_mgr_la_SOURCES = \
+    src/tcti-sgx-mgr.c \
+    src/tcti-sgx-mgr.map
+nodist_src_libtcti_sgx_mgr_la_SOURCES = src/tcti_sgx_u.c
 
 # unit tests
-test_tss2_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) -I/opt/intel/sgxsdk/include
-test_tss2_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
+test_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS)
-test_tss2_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tss2_tcti_sgx_init_param_tests_SOURCES = \
-    test/tss2-tcti-sgx-init-param-tests.c \
-    test/tss2-tcti-sgx_null-wraps.c \
-    src/tss2-tcti-sgx.c
-test_tss2_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
+test_tcti_sgx_init_param_tests_SOURCES = \
+    test/tcti-sgx-init-param-tests.c \
+    test/tcti-sgx_null-wraps.c \
+    src/tcti-sgx.c
+
+test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
-test_tss2_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
-test_tss2_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tss2_tcti_sgx_struct_tests_SOURCES = test/tss2-tcti-sgx-struct-tests.c \
-    test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
-    src/tss2-tcti-sgx.c
-test_tss2_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
+test_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
+test_tcti_sgx_struct_tests_SOURCES = \
+    test/tcti-sgx-struct-tests.c \
+    test/tcti-sgx_null-wraps.c \
+    test/tcti-sgx-common.c \
+    src/tcti-sgx.c
+
+test_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) 
-test_tss2_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
-test_tss2_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tss2_tcti_sgx_call_tests_SOURCES = test/tss2-tcti-sgx-call-tests.c \
-    test/tss2-tcti-sgx_null-wraps.c test/tss2-tcti-sgx-common.c \
-    src/tss2-tcti-sgx.c
+test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
+test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
+test_tcti_sgx_call_tests_SOURCES = \
+    test/tcti-sgx-call-tests.c \
+    test/tcti-sgx_null-wraps.c \
+    test/tcti-sgx-common.c \
+    src/tcti-sgx.c

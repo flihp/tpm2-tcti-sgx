@@ -12,19 +12,19 @@
 #include <tss2/tss2_tpm2_types.h>
 
 #include <tss2-tcti-sgx.h>
-#include "tss2-tcti-sgx_priv.h"
-#include "tss2-tcti-sgx-common.h"
+#include "tcti-sgx_priv.h"
+#include "tcti-sgx-common.h"
 
 int
-tss2_tcti_struct_setup (void **state)
+tcti_struct_setup (void **state)
 {
     TSS2_TCTI_CONTEXT *context = NULL;
     TSS2_RC ret = TSS2_RC_SUCCESS;
     size_t tcti_size = 0;
 
-    ret = tss2_tcti_sgx_init (NULL, &tcti_size);
+    ret = Tss2_Tcti_Sgx_Init (NULL, &tcti_size);
     if (ret != TSS2_RC_SUCCESS) {
-        printf ("tss2_tcti_sgx_init failed: %d\n", ret);
+        printf ("Tss2_Tcti_Sgx_Init failed: %d\n", ret);
         return 1;
     }
     context = calloc (1, tcti_size);
@@ -37,11 +37,11 @@ tss2_tcti_struct_setup (void **state)
      *   OCall returns an ID of 1
      *   OCall return value indicates success
      */
-    will_return (__wrap_tss2_tcti_sgx_init_ocall, 1);
-    will_return (__wrap_tss2_tcti_sgx_init_ocall, SGX_SUCCESS);
-    ret = tss2_tcti_sgx_init (context, 0);
+    will_return (__wrap_tcti_sgx_init_ocall, 1);
+    will_return (__wrap_tcti_sgx_init_ocall, SGX_SUCCESS);
+    ret = Tss2_Tcti_Sgx_Init (context, 0);
     if (ret != TSS2_RC_SUCCESS) {
-        printf ("tss2_tcti_sgx_init failed: %d\n", ret);
+        printf ("%s: tcti_sgx_init failed with RC 0x%x\n", __func__, ret);
         return 1;
     }
     *state = context;
@@ -49,7 +49,7 @@ tss2_tcti_struct_setup (void **state)
 }
 
 int
-tss2_tcti_struct_teardown (void **state)
+tcti_struct_teardown (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
 

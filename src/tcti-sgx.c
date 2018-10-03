@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 #include <tss2-tcti-sgx.h>
-#include "tss2-tcti-sgx_priv.h"
-#include "tss2_tcti_sgx_t.h"
+
+#include "tcti-sgx_priv.h"
+#include "tcti_sgx_t.h"
 
 /**
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * transmit function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_transmit (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_Transmit (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
@@ -19,20 +20,20 @@
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
 TSS2_RC
-tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
-                        size_t             size,
-                        uint8_t const     *command)
+tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
+                   size_t size,
+                   uint8_t const *command)
 {
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
+    if (TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
-    status = tss2_tcti_sgx_transmit_ocall (&retval,
-                                           TSS2_TCTI_SGX_ID (tcti_context),
-                                           size,
-                                           command);
+    status = tcti_sgx_transmit_ocall (&retval,
+                                      TCTI_SGX_ID (tcti_context),
+                                      size,
+                                      command);
     /**
      * Map SGX error codes to TSS2_RC error codes. If no SGX error return
      * the 'retval' parameter that contains the TSS2_RC value from outside
@@ -47,7 +48,7 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * receive function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_receive (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_Receive (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
@@ -56,22 +57,22 @@ tss2_tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
 TSS2_RC
-tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
-                       size_t            *size,
-                       uint8_t           *response,
-                       int32_t            timeout)
+tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
+                  size_t *size,
+                  uint8_t *response,
+                  int32_t timeout)
 {
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
+    if (TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
-    status = tss2_tcti_sgx_receive_ocall (&retval,
-                                          TSS2_TCTI_SGX_ID (tcti_context),
-                                          *size,
-                                          response,
-                                          timeout);
+    status = tcti_sgx_receive_ocall (&retval,
+                                     TCTI_SGX_ID (tcti_context),
+                                     *size,
+                                     response,
+                                     timeout);
     if (status == SGX_SUCCESS)
         return retval;
     else
@@ -81,27 +82,27 @@ tss2_tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * finalize function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_finalize (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_Finalize (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns void so all errors are silently ignored (this is
  * required by the TSS spec).
  */
 void
-tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
+tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 {
     sgx_status_t status;
 
     if (tcti_context == NULL)
         return;
 
-    status = tss2_tcti_sgx_finalize_ocall (TSS2_TCTI_SGX_ID (tcti_context));
+    status = tcti_sgx_finalize_ocall (TCTI_SGX_ID (tcti_context));
 }
 /**
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * cancel function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_cancel (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_Cancel (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
@@ -110,16 +111,15 @@ tss2_tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
 TSS2_RC
-tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
+tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
 {
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
+    if (TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
-    status = tss2_tcti_sgx_cancel_ocall (&retval,
-                                         TSS2_TCTI_SGX_ID (tcti_context));
+    status = tcti_sgx_cancel_ocall (&retval, TCTI_SGX_ID (tcti_context));
 
     if (status == SGX_SUCCESS)
         return retval;
@@ -130,7 +130,7 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * getPollHandles function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_get_poll_handles (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_GetPollHandles (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
@@ -143,9 +143,9 @@ tss2_tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
  *       while the ocall will still succeed.
  */
 TSS2_RC
-tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
-                                TSS2_TCTI_POLL_HANDLE *handles,
-                                size_t                *num_handles)
+tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT *tcti_context,
+                           TSS2_TCTI_POLL_HANDLE *handles,
+                           size_t *num_handles)
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
@@ -153,7 +153,7 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
  * setLocality function pointer. This function will be invoked when:
  * - TSS2_TCTI_CONTEXT object is initialized for the SGX TCTI
- * - the tss2_tcti_set_locality (ctx ...) is invoked with said context
+ * - the Tss2_Tcti_SetLocality (ctx ...) is invoked with said context
  * It's also possible to invoke this function directly but that should be
  * very rare.
  * This function returns:
@@ -162,18 +162,18 @@ tss2_tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT     *tcti_context,
  * - TSS2_TCTI_RC_GENERAL_FAILURE when an SGX error occurs
  */
 TSS2_RC
-tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
-                            uint8_t            locality)
+tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
+                       uint8_t locality)
 {
     sgx_status_t status;
     TSS2_RC retval;
 
-    if (TSS2_TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
+    if (TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
-    status = tss2_tcti_sgx_set_locality_ocall (&retval,
-                                               TSS2_TCTI_SGX_ID (tcti_context),
-                                               locality);
+    status = tcti_sgx_set_locality_ocall (&retval,
+                                          TCTI_SGX_ID (tcti_context),
+                                          locality);
 
     if (status == SGX_SUCCESS)
         return retval;
@@ -204,33 +204,33 @@ tss2_tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
  *   'size' parameter.
  */
 TSS2_RC
-tss2_tcti_sgx_init (TSS2_TCTI_CONTEXT *tcti_context,
-                    size_t            *size)
+Tss2_Tcti_Sgx_Init (TSS2_TCTI_CONTEXT *tcti_context,
+                    size_t *size)
 {
     sgx_status_t status;
 
     if (tcti_context == NULL && size == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     if (tcti_context == NULL && size != NULL) {
-        *size = sizeof (TSS2_TCTI_CONTEXT_SGX);
+        *size = sizeof (TCTI_CONTEXT_SGX);
         return TSS2_RC_SUCCESS;
     }
-    TSS2_TCTI_MAGIC (tcti_context) = TSS2_TCTI_SGX_MAGIC;
+    TSS2_TCTI_MAGIC (tcti_context) = TCTI_SGX_MAGIC;
     TSS2_TCTI_VERSION (tcti_context) = 1;
-    TSS2_TCTI_TRANSMIT (tcti_context) = tss2_tcti_sgx_transmit;
-    TSS2_TCTI_RECEIVE (tcti_context) = tss2_tcti_sgx_receive;
-    TSS2_TCTI_FINALIZE (tcti_context) = tss2_tcti_sgx_finalize;
-    TSS2_TCTI_CANCEL (tcti_context) = tss2_tcti_sgx_cancel;
-    TSS2_TCTI_GET_POLL_HANDLES (tcti_context) = tss2_tcti_sgx_get_poll_handles;
-    TSS2_TCTI_SET_LOCALITY (tcti_context) = tss2_tcti_sgx_set_locality;
+    TSS2_TCTI_TRANSMIT (tcti_context) = tcti_sgx_transmit;
+    TSS2_TCTI_RECEIVE (tcti_context) = tcti_sgx_receive;
+    TSS2_TCTI_FINALIZE (tcti_context) = tcti_sgx_finalize;
+    TSS2_TCTI_CANCEL (tcti_context) = tcti_sgx_cancel;
+    TSS2_TCTI_GET_POLL_HANDLES (tcti_context) = tcti_sgx_get_poll_handles;
+    TSS2_TCTI_SET_LOCALITY (tcti_context) = tcti_sgx_set_locality;
 
-    status = tss2_tcti_sgx_init_ocall (&TSS2_TCTI_SGX_ID (tcti_context));
+    status = tcti_sgx_init_ocall (&TCTI_SGX_ID (tcti_context));
     if (status != SGX_SUCCESS)
         return TSS2_TCTI_RC_GENERAL_FAILURE;
     /**
      * Only set state to READY_TO_TRANSMIT after ocall to initialize
      * connection completes successfully
      */
-    TSS2_TCTI_SGX_STATE (tcti_context) = READY_TO_TRANSMIT;
+    TCTI_SGX_STATE (tcti_context) = READY_TO_TRANSMIT;
     return TSS2_RC_SUCCESS;
 }

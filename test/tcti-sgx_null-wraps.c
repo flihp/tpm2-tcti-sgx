@@ -16,7 +16,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "tss2_tcti_sgx_t.h"
+#include "tcti_sgx_t.h"
 
 /**
  * This is a mock function for the initialization OCall.
@@ -25,49 +25,49 @@
  * stack for the ID (retval) and the sgx return status.
  */
 sgx_status_t
-__wrap_tss2_tcti_sgx_init_ocall (uint64_t *retval)
+__wrap_tcti_sgx_init_ocall (uint64_t *retval)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_transmit_ocall (TSS2_RC         *retval,
-                                     uint64_t         id,
-                                     size_t           size,
-                                     const uint8_t*   command)
+__wrap_tcti_sgx_transmit_ocall (TSS2_RC *retval,
+                                uint64_t id,
+                                size_t size,
+                                const uint8_t* command)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_receive_ocall (TSS2_RC   *retval,
-                                    uint64_t   id,
-                                    size_t     size,
-                                    uint8_t   *response,
-                                    uint32_t   timeout)
+__wrap_tcti_sgx_receive_ocall (TSS2_RC *retval,
+                               uint64_t id,
+                               size_t size,
+                               uint8_t *response,
+                               uint32_t timeout)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
 
 void
-__wrap_tss2_tcti_sgx_finalize_ocall (uint64_t *retval)
+__wrap_tcti_sgx_finalize_ocall (uint64_t *retval)
 {}
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_cancel_ocall (TSS2_RC  *retval,
-                                   uint64_t  id)
+__wrap_tcti_sgx_cancel_ocall (TSS2_RC *retval,
+                              uint64_t id)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
 
 sgx_status_t
-__wrap_tss2_tcti_sgx_set_locality_ocall (TSS2_RC   *retval,
-                                         uint64_t   id,
-                                         uint8_t    locality)
+__wrap_tcti_sgx_set_locality_ocall (TSS2_RC *retval,
+                                    uint64_t id,
+                                    uint8_t locality)
 {
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
