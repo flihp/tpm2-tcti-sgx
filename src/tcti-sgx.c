@@ -2,7 +2,7 @@
  * Copyright 2016 - 2018, Intel Corporation
  * SPDX-License-Identifier: BSD-2-Clause
  */
-#include <tss2-tcti-sgx.h>
+#include "tss2-tcti-sgx.h"
 
 #include "tcti-sgx_priv.h"
 #include "tcti_sgx_t.h"

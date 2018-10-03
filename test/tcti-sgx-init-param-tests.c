@@ -12,7 +12,7 @@
 
 #include <tss2/tss2_tpm2_types.h>
 
-#include <tss2-tcti-sgx.h>
+#include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
 
 /* when given an NULL context and a pointer to a size_t, set the size_t

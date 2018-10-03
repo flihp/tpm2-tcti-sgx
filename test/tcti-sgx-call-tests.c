@@ -9,7 +9,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include <tss2-tcti-sgx.h>
+#include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
 #include "tcti-sgx-common.h"
 

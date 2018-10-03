@@ -10,7 +10,7 @@
 
 #include <tss2/tss2_tpm2_types.h>
 
-#include <tss2-tcti-sgx.h>
+#include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
 #include "tcti-sgx-common.h"
 
