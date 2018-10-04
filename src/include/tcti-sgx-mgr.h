@@ -23,7 +23,7 @@ typedef struct tcti_sgx_mgr {
 typedef struct tcti_sgx_session {
     uint64_t id;
     TSS2_TCTI_CONTEXT *tcti_context;
-    GMutex *mutex;
+    GMutex mutex;
 } tcti_sgx_session_t;
 
 tcti_sgx_mgr_t* tcti_sgx_mgr_init (downstream_tcti_init_cb callback,

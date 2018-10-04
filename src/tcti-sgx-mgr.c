@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <glib.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -119,7 +120,7 @@ tcti_sgx_init_ocall ()
         free (session);
         return 0;
     }
-    g_mutex_init (session->mutex);
+    g_mutex_init (&session->mutex);
     g_mutex_lock (&mgr_global->session_table_mutex);
     insert_result = g_hash_table_insert (mgr_global->session_table,
                                          &session->id,
@@ -143,11 +144,11 @@ tcti_sgx_transmit_ocall (uint64_t id,
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (session->mutex);
+    g_mutex_lock (&session->mutex);
     ret = Tss2_Tcti_Transmit (session->tcti_context,
                               size,
                               command);
-    g_mutex_unlock (session->mutex);
+    g_mutex_unlock (&session->mutex);
     return ret;
 }
 
@@ -169,12 +170,12 @@ tcti_sgx_receive_ocall (uint64_t id,
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (session->mutex);
+    g_mutex_lock (&session->mutex);
     ret = Tss2_Tcti_Receive (session->tcti_context,
                              &size,
                              response,
                              timeout);
-    g_mutex_unlock (session->mutex);
+    g_mutex_unlock (&session->mutex);
 
     return ret;
 }
@@ -189,9 +190,9 @@ tcti_sgx_finalize_ocall (uint64_t id)
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return;
-    g_mutex_lock (session->mutex);
+    g_mutex_lock (&session->mutex);
     Tss2_Tcti_Finalize (session->tcti_context);
-    g_mutex_unlock (session->mutex);
+    g_mutex_unlock (&session->mutex);
 }
 
 TSS2_RC
@@ -205,9 +206,9 @@ tcti_sgx_cancel_ocall (uint64_t id)
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (session->mutex);
+    g_mutex_lock (&session->mutex);
     ret = Tss2_Tcti_Cancel (session->tcti_context);
-    g_mutex_unlock (session->mutex);
+    g_mutex_unlock (&session->mutex);
     return ret;
 }
 
@@ -231,8 +232,8 @@ tcti_sgx_set_locality_ocall (uint64_t id,
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (session->mutex);
+    g_mutex_lock (&session->mutex);
     ret = Tss2_Tcti_SetLocality (session->tcti_context, locality);
-    g_mutex_unlock (session->mutex);
+    g_mutex_unlock (&session->mutex);
     return ret;
 }
