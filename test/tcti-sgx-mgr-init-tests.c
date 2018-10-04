@@ -166,6 +166,19 @@ tcti_sgx_mgr_init_ocall_read_fail (void **state)
     assert_int_equal (id, 0);
 }
 
+#define TEST_ID  0xe981fd3173ea6a9c
+static void
+tcti_sgx_mgr_init_ocall_cb_fail (void **state)
+{
+    will_return (__wrap_open, 0);
+    will_return (__wrap_open, TEST_FD);
+    will_return (__wrap_calloc, passthrough);
+    will_return (__wrap_read, TEST_ID);
+    will_return (__wrap_read, sizeof (uint64_t));
+    uint64_t id = tcti_sgx_init_ocall ();
+    assert_int_equal (id, 0);
+}
+
 int
 main (void)
 {
@@ -187,6 +200,9 @@ main (void)
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_read_fail,
+                                         tcti_sgx_mgr_init_setup,
+                                         tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_cb_fail,
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
     };
