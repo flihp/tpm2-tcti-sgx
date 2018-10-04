@@ -58,7 +58,7 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
     }
     mgr_global->init_cb = callback;
     mgr_global->user_data = user_data;
-    g_mutex_init (mgr_global->session_table_mutex);
+    g_mutex_init (&mgr_global->session_table_mutex);
     mgr_global->session_table = g_hash_table_new (g_int64_hash, g_int64_equal);
 out:
     return mgr_global;
@@ -83,7 +83,7 @@ tcti_sgx_init_ocall ()
     if (session == NULL)
         g_error ("failed to allocate memory for session structure: %s",
                  strerror (errno));
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     if (read (fd, &session->id, sizeof (session->id)) != sizeof (session->id))
         g_error ("failed to read %d bytes from %s: %s",
                  sizeof (session->id),
@@ -98,7 +98,7 @@ tcti_sgx_init_ocall ()
                                          session);
     if (insert_result != TRUE)
         g_error ("failed to insert session into session table");
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     return session->id;
 }
 
@@ -110,9 +110,9 @@ tcti_sgx_transmit_ocall (uint64_t id,
     tcti_sgx_session_t *session;
     TSS2_RC ret;
 
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
@@ -136,9 +136,9 @@ tcti_sgx_receive_ocall (uint64_t id,
     if (timeout != TSS2_TCTI_TIMEOUT_BLOCK)
         return TSS2_TCTI_RC_BAD_VALUE;
 
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
@@ -156,9 +156,9 @@ tcti_sgx_finalize_ocall (uint64_t id)
 {
     tcti_sgx_session_t *session;
 
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return;
     g_mutex_lock (session->mutex);
@@ -172,9 +172,9 @@ tcti_sgx_cancel_ocall (uint64_t id)
     tcti_sgx_session_t *session;
     TSS2_RC ret;
 
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);
@@ -198,9 +198,9 @@ tcti_sgx_set_locality_ocall (uint64_t id,
     tcti_sgx_session_t *session;
     TSS2_RC ret;
 
-    g_mutex_lock (mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr_global->session_table_mutex);
     session = g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     g_mutex_lock (session->mutex);

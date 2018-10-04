@@ -17,7 +17,7 @@ typedef struct tcti_sgx_mgr {
     downstream_tcti_init_cb  init_cb;
     gpointer user_data;
     GHashTable *session_table;
-    GMutex *session_table_mutex;
+    GMutex session_table_mutex;
 } tcti_sgx_mgr_t;
 
 typedef struct tcti_sgx_session {
