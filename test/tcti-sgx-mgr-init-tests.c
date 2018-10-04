@@ -54,6 +54,26 @@ __wrap_open (const char *pathname,
      }
 }
 
+#define TEST_FD 0xa3c18ae2
+ssize_t
+__real_read (int fd,
+             void *buf,
+             size_t count);
+ssize_t
+__wrap_read (int fd,
+             void *buf,
+             size_t count)
+{
+    if (fd == TEST_FD) {
+        printf ("%s: mock read\n", __func__);
+        errno = mock_type (int);
+        return mock_type (ssize_t);
+    } else {
+        printf ("%s: real read\n", __func__);
+        return __real_read (fd, buf, count);
+    }
+}
+
 TSS2_TCTI_CONTEXT*
 callback (void *user_data)
 {
@@ -128,10 +148,22 @@ static void
 tcti_sgx_mgr_init_ocall_calloc_fail (void **state)
 {
      will_return (__wrap_open, 0);
-     will_return (__wrap_open, 666);
+     will_return (__wrap_open, TEST_FD);
      will_return (__wrap_calloc, null);
      uint64_t id = tcti_sgx_init_ocall ();
      assert_int_equal (id, 0);
+}
+
+static void
+tcti_sgx_mgr_init_ocall_read_fail (void **state)
+{
+    will_return (__wrap_open, 0);
+    will_return (__wrap_open, TEST_FD);
+    will_return (__wrap_calloc, passthrough);
+    will_return (__wrap_read, EACCES);
+    will_return (__wrap_read, -1);
+    uint64_t id = tcti_sgx_init_ocall ();
+    assert_int_equal (id, 0);
 }
 
 int
@@ -152,6 +184,9 @@ main (void)
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_calloc_fail,
+                                         tcti_sgx_mgr_init_setup,
+                                         tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_read_fail,
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
     };
