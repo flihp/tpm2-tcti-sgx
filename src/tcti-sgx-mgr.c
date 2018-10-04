@@ -114,8 +114,11 @@ tcti_sgx_init_ocall ()
         return 0;
     }
     session->tcti_context = mgr_global->init_cb (mgr_global->user_data);
-    if (session->tcti_context == NULL)
-        g_error ("tcti init callback failed to create a TCTI");
+    if (session->tcti_context == NULL) {
+        printf ("%s: tcti init callback failed to create a TCTI\n", __func__);
+        free (session);
+        return 0;
+    }
     g_mutex_init (session->mutex);
     g_mutex_lock (&mgr_global->session_table_mutex);
     insert_result = g_hash_table_insert (mgr_global->session_table,
