@@ -95,8 +95,11 @@ tcti_sgx_init_ocall ()
         return 0;
     }
     fd = open (RAND_SRC, O_RDONLY);
-    if (fd == -1)
-        g_error ("failed to open %s: %s", RAND_SRC, strerror (errno));
+    if (fd == -1) {
+        printf ("%s: failed to open %s: %s",
+                __func__, RAND_SRC, strerror (errno));
+        return 0;
+    }
     session = calloc (1, sizeof (tcti_sgx_session_t));
     if (session == NULL)
         g_error ("failed to allocate memory for session structure: %s",
