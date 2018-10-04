@@ -101,9 +101,11 @@ tcti_sgx_init_ocall ()
         return 0;
     }
     session = calloc (1, sizeof (tcti_sgx_session_t));
-    if (session == NULL)
-        g_error ("failed to allocate memory for session structure: %s",
-                 strerror (errno));
+    if (session == NULL) {
+        printf ("%s: failed to allocate memory for session structure: %s",
+                __func__, strerror (errno));
+        return 0;
+    }
     g_mutex_lock (&mgr_global->session_table_mutex);
     if (read (fd, &session->id, sizeof (session->id)) != sizeof (session->id))
         g_error ("failed to read %d bytes from %s: %s",

@@ -124,6 +124,16 @@ tcti_sgx_mgr_init_ocall_open_fail (void **state)
     assert_int_equal (id, 0);
 }
 
+static void
+tcti_sgx_mgr_init_ocall_calloc_fail (void **state)
+{
+     will_return (__wrap_open, 0);
+     will_return (__wrap_open, 666);
+     will_return (__wrap_calloc, null);
+     uint64_t id = tcti_sgx_init_ocall ();
+     assert_int_equal (id, 0);
+}
+
 int
 main (void)
 {
@@ -139,6 +149,9 @@ main (void)
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test (tcti_sgx_mgr_init_ocall_no_init),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_open_fail,
+                                         tcti_sgx_mgr_init_setup,
+                                         tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_calloc_fail,
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
     };
