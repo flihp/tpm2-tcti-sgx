@@ -28,6 +28,7 @@ typedef struct tcti_sgx_session {
 
 tcti_sgx_mgr_t* tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                                    gpointer user_data);
+void tcti_sgx_mgr_finalize (void);
 uint64_t tcti_sgx_init_ocall ();
 TSS2_RC tcti_sgx_transmit_ocall (uint64_t id,
                                  size_t size,

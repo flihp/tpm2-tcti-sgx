@@ -35,12 +35,17 @@ __wrap_calloc (size_t nmemb,
     }
 }
 
+static int
+tcti_sgx_mgr_init_teardown (void **state)
+{
+    tcti_sgx_mgr_finalize ();
+    return 0;
+}
+
 static void
 tcti_sgx_mgr_init_null_callback (void **state)
 {
-    tcti_sgx_mgr_t* mgr = NULL;
-
-    mgr = tcti_sgx_mgr_init (NULL, NULL);
+    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (NULL, NULL);
     assert_null (mgr);
 }
 
@@ -62,7 +67,8 @@ static void
 tcti_sgx_mgr_init_null_data (void **state)
 {
     will_return (__wrap_calloc, passthrough);
-    tcti_sgx_mgr_t* mgr = tcti_sgx_mgr_init (callback, NULL);
+
+    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (callback, NULL);
     assert_non_null (mgr);
     assert_int_equal (mgr->init_cb, callback);
     assert_null (mgr->user_data);
@@ -71,10 +77,12 @@ int
 main (void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test (tcti_sgx_mgr_init_null_callback),
-        /* order matters here thanks to the static 'mgr_global' */
-        cmocka_unit_test (tcti_sgx_mgr_init_calloc_fail),
-        cmocka_unit_test (tcti_sgx_mgr_init_null_data),
+        cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_callback,
+                                   tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_teardown (tcti_sgx_mgr_init_calloc_fail,
+                                   tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_data,
+                                   tcti_sgx_mgr_init_teardown),
     };
 
     return cmocka_run_group_tests (tests, NULL, NULL);

@@ -70,6 +70,16 @@ out:
     return mgr_global;
 }
 
+void
+tcti_sgx_mgr_finalize (void)
+{
+    if (mgr_global != NULL) {
+        g_hash_table_unref (mgr_global->session_table);
+        free (mgr_global);
+        mgr_global = NULL;
+    }
+}
+
 /*
  * function called by enclave to initialize new TCTI connection
  */
