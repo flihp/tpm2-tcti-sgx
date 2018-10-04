@@ -35,4 +35,5 @@ test/tcti-sgx-call-tests
 test/tcti-sgx-mgr-init-tests
 test/tcti-sgx-init-param-tests
 test/tcti-sgx-struct-tests
+AUTHORS
 VERSION

@@ -35,6 +35,7 @@ EXTRA_DIST = \
     src/include/tcti-sgx_priv.h \
     src/tcti_sgx.edl \
     test/tcti-sgx-common.h \
+    AUTHORS \
     VERSION
 
 CMOCKA_WRAPS = \
@@ -106,3 +107,7 @@ test_tcti_sgx_call_tests_SOURCES = \
     test/tcti-sgx_null-wraps.c \
     test/tcti-sgx-common.c \
     src/tcti-sgx.c
+
+AUTHORS :
+	git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort | \
+	    uniq -c | sort -nr | sed 's/^\s*//' | cut -d" " -f2- > $@
