@@ -73,6 +73,13 @@ tcti_sgx_mgr_init_null_data (void **state)
     assert_int_equal (mgr->init_cb, callback);
     assert_null (mgr->user_data);
 }
+
+static void
+tcti_sgx_mgr_init_ocall_no_init (void **state)
+{
+    uint64_t id = tcti_sgx_init_ocall ();
+    assert_int_equal (id, 0);
+}
 int
 main (void)
 {
@@ -83,6 +90,7 @@ main (void)
                                    tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_data,
                                    tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test (tcti_sgx_mgr_init_ocall_no_init),
     };
 
     return cmocka_run_group_tests (tests, NULL, NULL);

@@ -90,8 +90,10 @@ tcti_sgx_init_ocall ()
     gint fd;
     gboolean insert_result;
 
-    if (mgr_global == NULL)
-        g_error ("%s: tcti_sgx_mgr not initialized", __func__);
+    if (mgr_global == NULL) {
+        printf ("%s: tcti_sgx_mgr not initialized\n", __func__);
+        return 0;
+    }
     fd = open (RAND_SRC, O_RDONLY);
     if (fd == -1)
         g_error ("failed to open %s: %s", RAND_SRC, strerror (errno));
