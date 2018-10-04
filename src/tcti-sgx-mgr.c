@@ -49,8 +49,14 @@ tcti_sgx_mgr_t*
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    gpointer user_data)
 {
-    if (mgr_global != NULL)
-        g_error ("%s: already initialized", __func__);
+    if (mgr_global != NULL) {
+        printf ("already initialized\n");
+        return NULL;
+    }
+    if (callback == NULL) {
+        printf ("callback parameter is required\n");
+        return NULL;
+    }
     mgr_global = calloc (1, sizeof (tcti_sgx_mgr_t));
     if (mgr_global == NULL) {
         perror ("calloc");
