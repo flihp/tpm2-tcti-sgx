@@ -91,12 +91,10 @@ tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
 void
 tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 {
-    sgx_status_t status;
-
     if (tcti_context == NULL)
         return;
 
-    status = tcti_sgx_finalize_ocall (TCTI_SGX_ID (tcti_context));
+    tcti_sgx_finalize_ocall (TCTI_SGX_ID (tcti_context));
 }
 /*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
