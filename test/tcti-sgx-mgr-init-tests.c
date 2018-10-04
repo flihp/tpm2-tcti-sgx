@@ -102,6 +102,13 @@ tcti_sgx_mgr_init_null_data (void **state)
 }
 
 static void
+tcti_sgx_mgr_init_twice (void **state)
+{
+    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (callback, NULL);
+    assert_null (mgr);
+}
+
+static void
 tcti_sgx_mgr_init_ocall_no_init (void **state)
 {
     uint64_t id = tcti_sgx_init_ocall ();
@@ -127,6 +134,9 @@ main (void)
                                    tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_data,
                                    tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_twice,
+                                         tcti_sgx_mgr_init_setup,
+                                         tcti_sgx_mgr_init_teardown),
         cmocka_unit_test (tcti_sgx_mgr_init_ocall_no_init),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_open_fail,
                                          tcti_sgx_mgr_init_setup,
