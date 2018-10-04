@@ -19,6 +19,7 @@ lib_LTLIBRARIES = \
 # connect unit tests to the test harness
 check_PROGRAMS  = \
     test/tcti-sgx-init-param-tests \
+    test/tcti-sgx-mgr-init-tests \
     test/tcti-sgx-struct-tests \
     test/tcti-sgx-call-tests
 TESTS = $(check_PROGRAMS)
@@ -77,6 +78,14 @@ test_tcti_sgx_init_param_tests_SOURCES = \
     test/tcti-sgx-init-param-tests.c \
     test/tcti-sgx_null-wraps.c \
     src/tcti-sgx.c
+
+test_tcti_sgx_mgr_init_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
+test_tcti_sgx_mgr_init_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS)
+test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc
+test_tcti_sgx_mgr_init_tests_SOURCES = \
+    test/tcti-sgx-mgr-init-tests.c \
+    src/tcti-sgx-mgr.c
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
