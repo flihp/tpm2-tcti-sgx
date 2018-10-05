@@ -65,8 +65,10 @@ __wrap_read (int fd,
              size_t count)
 {
     if (fd == TEST_FD) {
+        tcti_sgx_session_t *session = (tcti_sgx_session_t*)buf;
         printf ("%s: mock read\n", __func__);
         errno = mock_type (int);
+        session->id = mock_type (uint64_t);
         return mock_type (ssize_t);
     } else {
         printf ("%s: real read\n", __func__);
@@ -85,6 +87,22 @@ tcti_sgx_mgr_init_setup (void **state)
 {
     will_return (__wrap_calloc, passthrough);
     *state = tcti_sgx_mgr_init (callback, NULL);
+    return 0;
+}
+
+#define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
+TSS2_TCTI_CONTEXT*
+callback_ctx (void *user_data)
+{
+    return TEST_CTX;
+}
+
+#define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
+static int
+tcti_sgx_mgr_init_setup_ctx (void **state)
+{
+    will_return (__wrap_calloc, passthrough);
+    *state = tcti_sgx_mgr_init (callback_ctx, NULL);
     return 0;
 }
 
@@ -161,6 +179,7 @@ tcti_sgx_mgr_init_ocall_read_fail (void **state)
     will_return (__wrap_open, TEST_FD);
     will_return (__wrap_calloc, passthrough);
     will_return (__wrap_read, EACCES);
+    will_return (__wrap_read, 0);
     will_return (__wrap_read, -1);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, 0);
@@ -173,8 +192,32 @@ tcti_sgx_mgr_init_ocall_cb_fail (void **state)
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
     will_return (__wrap_calloc, passthrough);
+    will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
+    uint64_t id = tcti_sgx_init_ocall ();
+    assert_int_equal (id, 0);
+}
+
+gboolean
+__wrap_g_hash_table_insert (GHashTable *hash_table,
+                            gpointer key,
+                            gpointer value)
+{
+    printf ("%s:\n", __func__);
+    return mock_type (gboolean);
+}
+
+static void
+tcti_sgx_mgr_init_ocall_insert_fail (void **state)
+{
+    will_return (__wrap_open, 0);
+    will_return (__wrap_open, TEST_FD);
+    will_return (__wrap_calloc, passthrough);
+    will_return (__wrap_read, 0);
+    will_return (__wrap_read, TEST_ID);
+    will_return (__wrap_read, sizeof (uint64_t));
+    will_return (__wrap_g_hash_table_insert, FALSE);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, 0);
 }
@@ -204,6 +247,9 @@ main (void)
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_cb_fail,
                                          tcti_sgx_mgr_init_setup,
+                                         tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_insert_fail,
+                                         tcti_sgx_mgr_init_setup_ctx,
                                          tcti_sgx_mgr_init_teardown),
     };
 
