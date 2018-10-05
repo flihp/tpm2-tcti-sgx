@@ -125,8 +125,12 @@ tcti_sgx_init_ocall ()
     insert_result = g_hash_table_insert (mgr_global->session_table,
                                          &session->id,
                                          session);
-    if (insert_result != TRUE)
-        g_error ("failed to insert session into session table");
+    if (insert_result != TRUE) {
+        printf ("%s: failed to insert session into session table\n", __func__);
+        g_mutex_unlock (&mgr_global->session_table_mutex);
+        free (session);
+        return 0;
+    }
     g_mutex_unlock (&mgr_global->session_table_mutex);
     return session->id;
 }
