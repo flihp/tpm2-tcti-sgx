@@ -39,9 +39,9 @@ TSS2_RC tcti_sgx_receive_ocall (uint64_t id,
                                 uint32_t timeout);
 void tcti_sgx_finalize_ocall (uint64_t id);
 TSS2_RC tcti_sgx_cancel_ocall (uint64_t id);
-TSS2_RC tcti_sgx_get_poll_handles (uint64_t id,
-                                   TSS2_TCTI_POLL_HANDLE *handles,
-                                   size_t *num_handles);
+TSS2_RC tcti_sgx_get_poll_handles_ocall (uint64_t id,
+                                         TSS2_TCTI_POLL_HANDLE *handles,
+                                         size_t *num_handles);
 TSS2_RC tcti_sgx_set_locality_ocall (uint64_t id,
                                      uint8_t locality);
 

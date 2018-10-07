@@ -217,9 +217,9 @@ tcti_sgx_cancel_ocall (uint64_t id)
 }
 
 TSS2_RC
-tcti_sgx_get_poll_handles (uint64_t id,
-                           TSS2_TCTI_POLL_HANDLE *handles,
-                           size_t *num_handles)
+tcti_sgx_get_poll_handles_ocall (uint64_t id,
+                                 TSS2_TCTI_POLL_HANDLE *handles,
+                                 size_t *num_handles)
 {
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
