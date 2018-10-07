@@ -20,6 +20,7 @@ lib_LTLIBRARIES = \
 check_PROGRAMS  = \
     test/tcti-sgx-init-param-tests \
     test/tcti-sgx-mgr-init-tests \
+    test/tcti-sgx-mgr-ocall-tests \
     test/tcti-sgx-struct-tests \
     test/tcti-sgx-call-tests
 TESTS = $(check_PROGRAMS)
@@ -87,6 +88,14 @@ test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
     -Wl,--wrap=read,--wrap=g_hash_table_insert
 test_tcti_sgx_mgr_init_tests_SOURCES = \
     test/tcti-sgx-mgr-init-tests.c \
+    src/tcti-sgx-mgr.c
+
+test_tcti_sgx_mgr_ocall_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
+test_tcti_sgx_mgr_ocall_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS)
+test_tcti_sgx_mgr_ocall_tests_LDFLAGS = -Wl,--wrap=g_hash_table_lookup
+test_tcti_sgx_mgr_ocall_tests_SOURCES = \
+    test/tcti-sgx-mgr-ocall-tests.c \
     src/tcti-sgx-mgr.c
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
