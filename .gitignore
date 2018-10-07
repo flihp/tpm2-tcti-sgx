@@ -31,9 +31,8 @@ missing
 test-driver
 src/tcti_sgx_t.*
 src/tcti_sgx_u.*
-test/tcti-sgx-call-tests
-test/tcti-sgx-mgr-init-tests
-test/tcti-sgx-init-param-tests
-test/tcti-sgx-struct-tests
+test/*
+!test/*.c
+!test/*.h
 AUTHORS
 VERSION
