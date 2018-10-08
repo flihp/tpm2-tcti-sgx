@@ -12,9 +12,8 @@ CLEANFILES = \
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
-lib_LTLIBRARIES = \
-    src/libtss2-tcti-sgx.la \
-    src/libtcti-sgx-mgr.la
+lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
+lib_LIBRARIES = src/libtss2-tcti-sgx.a
 
 # connect unit tests to the test harness
 check_PROGRAMS  = \
@@ -54,12 +53,10 @@ CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
    "$(abs_top_srcdir)/src/tcti_sgx_u.*"
 
 # enclave library
-src_libtss2_tcti_sgx_la_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
-src_libtss2_tcti_sgx_la_LDFLAGS = -static $(ENCLAVE_LDFLAGS) -Wl,--no-undefined \
-    -Wl,--version-script=src/tcti-sgx.map
-src_libtss2_tcti_sgx_la_LDLIBS  = $(ENCLAVE_LDLIBS)
-src_libtss2_tcti_sgx_la_SOURCES = src/tcti-sgx.c src/tcti-sgx.map
-nodist_src_libtss2_tcti_sgx_la_SOURCES = src/tcti_sgx_t.c
+src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
+src_libtss2_tcti_sgx_a_LDLIBS  = $(ENCLAVE_LDLIBS)
+src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c src/tcti-sgx.map
+nodist_src_libtss2_tcti_sgx_a_SOURCES = src/tcti_sgx_t.c
 
 # application library
 src_libtcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
