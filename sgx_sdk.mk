@@ -44,8 +44,8 @@ ENCLAVE_LDLIBS = -Wl,--whole-archive -l$(TRTS_LIBRARY_NAME) \
     -Wl,--end-group
 
 %_u.h %_u.c : %.edl
-	$(SGX_EDGER8R) --untrusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --untrusted-dir $(srcdir)/src $^
+	$(SGX_EDGER8R) --untrusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --untrusted-dir $(dir $^) $^
 
 %_t.h %_t.c : %.edl
-	$(SGX_EDGER8R) --trusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --trusted-dir $(srcdir)/src $^
+	$(SGX_EDGER8R) --trusted --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH) --trusted-dir $(dir $^) $^
 

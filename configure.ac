@@ -7,7 +7,7 @@ AC_INIT([tpm2-tcti-sgx],
         [https://example.org/tpm2-tcti-sgx])
 AC_PROG_CC
 LT_INIT
-AM_INIT_AUTOMAKE([subdir-objects])
+AM_INIT_AUTOMAKE([subdir-objects] [-Wno-portability])
 AC_CONFIG_FILES([Makefile])
 PKG_CHECK_MODULES([CMOCKA],[cmocka >= 1.1])
 PKG_CHECK_MODULES([GLIB],[glib-2.0])
