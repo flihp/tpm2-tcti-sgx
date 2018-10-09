@@ -57,6 +57,7 @@ src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_a_LDLIBS  = $(ENCLAVE_LDLIBS)
 src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c src/tcti-sgx.map
 nodist_src_libtss2_tcti_sgx_a_SOURCES = src/tcti_sgx_t.c
+src/src_libtss2_tcti_sgx_a-tcti-sgx.$(OBJEXT): src/tcti_sgx_t.c
 
 # application library
 src_libtcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
@@ -66,6 +67,7 @@ src_libtcti_sgx_mgr_la_SOURCES = \
     src/tcti-sgx-mgr.c \
     src/tcti-sgx-mgr.map
 nodist_src_libtcti_sgx_mgr_la_SOURCES = src/tcti_sgx_u.c
+./src/src_libtcti_sgx_mgr_la-tcti-sgx-mgr.lo: src/tcti_sgx_u.c
 
 # unit tests
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
