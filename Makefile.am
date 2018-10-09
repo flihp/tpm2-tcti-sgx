@@ -19,6 +19,7 @@ BUILT_SOURCES = $(CLEANFILES)
 # things we're building
 lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtss2-tcti-sgx.a
+noinst_PROGRAMS = example/application
 
 all-local: \
     example/enclave-signed.so
@@ -78,6 +79,12 @@ nodist_src_libtcti_sgx_mgr_la_SOURCES = src/tcti_sgx_u.c
 ./src/src_libtcti_sgx_mgr_la-tcti-sgx-mgr.lo: src/tcti_sgx_u.c
 
 # example application & enclave
+example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -I$(SGX_SDK)/include
+example_application_LDADD = $(GLIB_LIBS) -L$(SGX_LIBRARY_PATH) -l$(URTS_LIBRARY_NAME)
+example_application_SOURCES = example/application.c example/enclave_ocalls.c
+nodist_example_application_SOURCES = example/enclave_u.c
+example/application.$(OBJEXT): example/enclave_u.c
+
 example/.deps:
 	mkdir -p $@
 example/enclave_t.$(OBJEXT): example/enclave_t.c | example/.deps
