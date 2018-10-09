@@ -21,7 +21,7 @@ lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtss2-tcti-sgx.a
 
 all-local: \
-    example/enclave.so
+    example/enclave-signed.so
 
 # connect unit tests to the test harness
 check_PROGRAMS  = \
@@ -87,6 +87,12 @@ example/enclave.so: LDFLAGS+=$(ENCLAVE_LDFLAGS)
 example/enclave.so: LDLIBS+=$(ENCLAVE_LDLIBS)
 example/enclave.so: example/enclave_t.$(OBJEXT) example/enclave.$(OBJEXT) src/libtss2-tcti-sgx.a
 	$(CC) $(LDFLAGS) $^ -o $@ -Bstatic $(LDLIBS)
+
+example/rsa3k.pem:
+	openssl genrsa -3 -out $@ 3072
+
+example/enclave-signed.so: example/enclave.so example/rsa3k.pem
+	$(SGX_ENCLAVE_SIGNER) sign -key example/rsa3k.pem -enclave $< -out $@ -config example/example.config.xml
 
 # unit tests
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
