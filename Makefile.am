@@ -8,12 +8,20 @@ CLEANFILES = \
     src/tcti_sgx_t.h \
     src/tcti_sgx_t.c \
     src/tcti_sgx_u.h \
-    src/tcti_sgx_u.c
+    src/tcti_sgx_u.c \
+    example/enclave_t.h \
+    example/enclave_t.c \
+    example/enclave_u.h \
+    example/enclave_u.c
+
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
 lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtss2-tcti-sgx.a
+
+all-local: \
+    example/enclave.so
 
 # connect unit tests to the test harness
 check_PROGRAMS  = \
@@ -68,6 +76,17 @@ src_libtcti_sgx_mgr_la_SOURCES = \
     src/tcti-sgx-mgr.map
 nodist_src_libtcti_sgx_mgr_la_SOURCES = src/tcti_sgx_u.c
 ./src/src_libtcti_sgx_mgr_la-tcti-sgx-mgr.lo: src/tcti_sgx_u.c
+
+# example application & enclave
+example/.deps:
+	mkdir -p $@
+example/enclave_t.$(OBJEXT): example/enclave_t.c | example/.deps
+
+example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS)
+example/enclave.so: LDFLAGS+=$(ENCLAVE_LDFLAGS)
+example/enclave.so: LDLIBS+=$(ENCLAVE_LDLIBS)
+example/enclave.so: example/enclave_t.$(OBJEXT) example/enclave.$(OBJEXT) src/libtss2-tcti-sgx.a
+	$(CC) $(LDFLAGS) $^ -o $@ -Bstatic $(LDLIBS)
 
 # unit tests
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \

@@ -1,0 +1,9 @@
+enclave {
+
+    trusted {
+        public uint32_t getcap_manufacturer(void);
+    };
+    untrusted {
+        void print_string([in, string] const char *str);
+    };
+};
