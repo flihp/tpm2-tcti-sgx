@@ -7,12 +7,13 @@
 #include <glib.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <tss2/tss2_tcti.h>
 
 #include "tcti-sgx-mgr.h"
-#include "tcti_sgx_u.h"
 
 #define RAND_SRC "/dev/urandom"
 

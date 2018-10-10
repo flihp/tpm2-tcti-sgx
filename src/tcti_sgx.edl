@@ -5,11 +5,6 @@
  enclave {
     include "tss2/tss2_tpm2_types.h"
 
-    trusted {
-        public int tcti_sgx_init_ecall (void);
-        public int tcti_sgx_finalize_ecall (void);
-    };
-
     untrusted {
         uint64_t tcti_sgx_init_ocall (void);
         TSS2_RC tcti_sgx_transmit_ocall (uint64_t session_id,

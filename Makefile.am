@@ -5,10 +5,6 @@ include sgx_sdk.mk
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = $(TSS2_SYS_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
-    src/tcti_sgx_t.h \
-    src/tcti_sgx_t.c \
-    src/tcti_sgx_u.h \
-    src/tcti_sgx_u.c \
     example/enclave_t.h \
     example/enclave_t.c \
     example/enclave_u.h \
@@ -17,8 +13,7 @@ CLEANFILES = \
 BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
-lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
-lib_LIBRARIES = src/libtss2-tcti-sgx.a
+lib_LIBRARIES = src/libtcti-sgx-mgr.a src/libtss2-tcti-sgx.a
 noinst_PROGRAMS = example/application
 
 all-local: \
@@ -64,19 +59,12 @@ CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
 # enclave library
 src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
 src_libtss2_tcti_sgx_a_LDLIBS  = $(ENCLAVE_LDLIBS)
-src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c src/tcti-sgx.map
-nodist_src_libtss2_tcti_sgx_a_SOURCES = src/tcti_sgx_t.c
-src/src_libtss2_tcti_sgx_a-tcti-sgx.$(OBJEXT): src/tcti_sgx_t.c
+src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 
 # application library
-src_libtcti_sgx_mgr_la_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
-src_libtcti_sgx_mgr_la_LDFLAGS = -Wl,--version-script=src/tcti-sgx-mgr.map
-src_libtcti_sgx_mgr_la_LDLIBS  = $(GLIB_LIBS)
-src_libtcti_sgx_mgr_la_SOURCES = \
-    src/tcti-sgx-mgr.c \
-    src/tcti-sgx-mgr.map
-nodist_src_libtcti_sgx_mgr_la_SOURCES = src/tcti_sgx_u.c
-./src/src_libtcti_sgx_mgr_la-tcti-sgx-mgr.lo: src/tcti_sgx_u.c
+src_libtcti_sgx_mgr_a_CFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
+src_libtcti_sgx_mgr_a_LDLIBS  = $(GLIB_LIBS)
+src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.c
 
 # example application & enclave
 example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -I$(SGX_SDK)/include
