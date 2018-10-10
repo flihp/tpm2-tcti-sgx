@@ -37,7 +37,7 @@ libtcti_sgx_mgr_HEADERS = $(srcdir)/src/include/tcti-sgx-mgr.h
 
 EXTRA_DIST = \
     src/include/tcti-sgx_priv.h \
-    src/tcti_sgx.edl \
+    src/tss2_tcti_sgx.edl \
     test/tcti-sgx-common.h \
     AUTHORS \
     VERSION
