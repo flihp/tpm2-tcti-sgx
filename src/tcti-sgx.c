@@ -65,10 +65,12 @@ tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
      * the 'retval' parameter that contains the TSS2_RC value from outside
      * the enclave.
      */
-    if (status == SGX_SUCCESS)
+    if (status == SGX_SUCCESS) {
+        TCTI_SGX_STATE (tcti_context) = READY_TO_RECEIVE;
         return retval;
-    else
+    } else {
         return TSS2_TCTI_RC_GENERAL_FAILURE;
+    }
 }
 /*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
@@ -99,10 +101,12 @@ tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
                                      *size,
                                      response,
                                      timeout);
-    if (status == SGX_SUCCESS)
+    if (status == SGX_SUCCESS) {
+        TCTI_SGX_STATE (tcti_context) = READY_TO_TRANSMIT;
         return retval;
-    else
+    } else {
         return TSS2_TCTI_RC_GENERAL_FAILURE;
+    }
 }
 /*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
@@ -145,10 +149,12 @@ tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
 
     status = tcti_sgx_cancel_ocall (&retval, TCTI_SGX_ID (tcti_context));
 
-    if (status == SGX_SUCCESS)
+    if (status == SGX_SUCCESS) {
+        TCTI_SGX_STATE (tcti_context) = READY_TO_TRANSMIT;
         return retval;
-    else
+    } else {
         return TSS2_TCTI_RC_GENERAL_FAILURE;
+    }
 }
 /*
  * This is the function that is hooked into the standard TSS2_TCTI_CONTEXT
