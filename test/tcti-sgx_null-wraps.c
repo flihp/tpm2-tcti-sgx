@@ -16,7 +16,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "tcti_sgx_t.h"
+#include <tss2/tss2_tpm2_types.h>
 
 /*
  * This is a mock function for the initialization OCall.
