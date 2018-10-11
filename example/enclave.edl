@@ -1,5 +1,7 @@
 enclave {
 
+    from "../src/tss2_tcti_sgx.edl" import *;
+
     trusted {
         public uint32_t getcap_manufacturer(void);
     };

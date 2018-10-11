@@ -67,8 +67,10 @@ src_libtcti_sgx_mgr_a_LDLIBS  = $(GLIB_LIBS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.c
 
 # example application & enclave
-example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) -I$(SGX_SDK)/include
-example_application_LDADD = $(GLIB_LIBS) -L$(SGX_LIBRARY_PATH) -l$(URTS_LIBRARY_NAME)
+example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS) \
+     -I$(SGX_SDK)/include
+example_application_LDADD = $(GLIB_LIBS) $(TABRMD_LIBS) \
+    -L$(SGX_LIBRARY_PATH) -l$(URTS_LIBRARY_NAME) src/libtcti-sgx-mgr.a
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/application.$(OBJEXT): example/enclave_u.c

@@ -41,9 +41,10 @@ ENCLAVE_LDFLAGS = -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles \
     -Wl,-fuse-ld=gold -Wl,--rosegment
 ENCLAVE_LDLIBS = -Wl,--whole-archive -l$(TRTS_LIBRARY_NAME) \
     -Wl,--no-whole-archive -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto \
-    -Wl,--end-group
+    -l$(SERVICE_LIBRARY_NAME) -Wl,--end-group
 
-ENCLAVE_SEARCH_PATH = --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH)
+ENCLAVE_SEARCH_PATH = --search-path $(srcdir)/src \
+    --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_PATH)
 
 %_u.h %_u.c : %.edl
 	$(SGX_EDGER8R) --untrusted $(ENCLAVE_SEARCH_PATH) --untrusted-dir $(dir $^) $^
