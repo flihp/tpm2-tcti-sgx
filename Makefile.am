@@ -3,7 +3,7 @@
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = $(TSS2_SYS_CFLAGS) -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
+AM_CFLAGS = -I$(SGX_INCLUDE_PATH) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
 CLEANFILES = \
     example/enclave_t.h \
     example/enclave_t.c \
