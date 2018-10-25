@@ -20,12 +20,14 @@ all-local: \
     example/enclave-signed.so
 
 # connect unit tests to the test harness
+if UNIT
 check_PROGRAMS  = \
     test/tcti-sgx-init-param-tests \
     test/tcti-sgx-mgr-init-tests \
     test/tcti-sgx-mgr-ocall-tests \
     test/tcti-sgx-struct-tests \
     test/tcti-sgx-call-tests
+endif
 TESTS = $(check_PROGRAMS)
 
 # headers and where to install them
