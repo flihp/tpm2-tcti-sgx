@@ -9,6 +9,7 @@ AC_PROG_CC
 LT_INIT
 AM_INIT_AUTOMAKE([subdir-objects] [-Wno-portability])
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_MACRO_DIRS([m4])
 
 # enable / disable unit tests: --[enable|disable]-unit
 AC_ARG_ENABLE(
