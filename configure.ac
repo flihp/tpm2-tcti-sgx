@@ -11,6 +11,9 @@ AM_INIT_AUTOMAKE([subdir-objects] [-Wno-portability])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_MACRO_DIRS([m4])
 
+# ensure SGX SDK environment has been setup
+AS_IF([test -z "$SGX_SDK"],[AC_MSG_ERROR([SGX SDK environment not setup.])])
+
 # enable / disable unit tests: --[enable|disable]-unit
 AC_ARG_ENABLE(
     [unit],
@@ -29,48 +32,54 @@ AS_IF(
     ])
 AM_CONDITIONAL([UNIT],[test "x$enable_unit" == "xyes"])
 
+# allow caller to specify mode (sim or hw)
+AC_ARG_ENABLE(
+    [sim],
+    [AS_HELP_STRING([--enable-sim],
+                    [Build example enclave for SGX simulator (default is yes)])],
+    [enable_sim=$enableval],
+    [sim=yes])
+# Export names of trts & tservice SGX libraries. These are dependent on
+# whether or not the component is being linked to run in simulator mode.
+AS_IF(
+    [test "x$sim" = "xyes"],
+    [
+    SGX_SIM_SUFFIX="_sim"
+    AC_SUBST([SGX_TRTS_LIB],[sgx_trts_sim])
+    AC_SUBST([SGX_TSERVICE_LIB],[sgx_tservice_sim])
+    ],
+    [test "x$sim" = "xno"],
+    [
+    AC_SUBST([SGX_TRTS_LIB],[sgx_trts])
+    AC_SUBST([SGX_TSERVICE_LIB],[sgx_tservice])
+    ],
+    [AC_MSG_ERROR([bad value for --enable-sim: $sim])])
+
 PKG_CHECK_MODULES([GLIB],[glib-2.0])
 PKG_CHECK_MODULES([TABRMD],[tss2-tcti-tabrmd >= 2.0])
+PKG_CHECK_MODULES([SGX_URTS],[libsgx_urts$SGX_SIM_SUFFIX >= 2.0])
 AX_CODE_COVERAGE
-# get sizeof void pointer, define variable to let Makefile.am know
-AC_CHECK_SIZEOF([void*])
-AM_CONDITIONAL([SGX_32BITS],[test x$ac_cv_sizeof_voidp = x4])
-AM_CONDITIONAL([SGX_64BITS],[test x$ac_cv_sizeof_voidp = x8])
-# allow caller to specify mode (sim or hw)
-AC_ARG_ENABLE([sim],
-[  --enable-sim    Turn on SGX simulation],
-[case "${enableval}" in
-  yes) sim=true ;;
-  no)  sim=false ;;
-  *) AC_MSG_ERROR([bad value ${enableval} for --enable-sim]) ;;
-esac],[sim=true])
-AM_CONDITIONAL([SGX_MODE_SIM], [test x$sim = xtrue])
-# Location of SGX SDK directory. This requires special handling because it
-# disregards many GNU Make / Linux conventions.
-AC_ARG_WITH([sgxsdkdir],
-            AS_HELP_STRING([--with-sgxsdkdir],
-                           [Path to SGX SDK]),
-            [with_sgxsdkdir=$withval],
-            [with_sgxsdkdir=/opt/intel/sgxsdk])
-AC_SUBST([SGX_SDK],[$with_sgxsdkdir])
 
 # check for required SGX tools
 AC_ARG_VAR([SGX_SIGN_BIN],[SGX signing tool (sgx_sign).])
-AC_PATH_PROG([SGX_SIGN_BIN],[sgx_sign],[],[$PATH:$with_sgxsdkdir/bin/x64])
+AC_PATH_PROG([SGX_SIGN_BIN],[sgx_sign])
 AS_IF([test -z "$SGX_SIGN_BIN"],
-      [AC_MSG_ERROR([sgx_sign tool is required to build example enclave])])
+      [AC_MSG_ERROR([sgx_sign tool not found, source SGX SDK 'environment' script])])
 AC_ARG_VAR([SGX_EDGER8R_BIN],[SGX signing tool (sgx_sign).])
-AC_PATH_PROG([SGX_EDGER8R_BIN],[sgx_edger8r],[],[$PATH:$with_sgxsdkdir/bin/x64])
+AC_PATH_PROG([SGX_EDGER8R_BIN],[sgx_edger8r])
 AS_IF([test -z "$SGX_EDGER8R_BIN"],
-      [AC_MSG_ERROR([sgx_edger8r tool is required to build example enclave])])
+      [AC_MSG_ERROR([sgx_edger8r tool not found, source SGX SDK 'environment' script])])
 
 # check for required SGX headers, export INCLUDE path
 AC_ARG_VAR([SGX_INCLUDE_DIR],[SGX SDK include directory])
 AS_IF([test -z $SGX_INCLUDE_DIR],
-      [SGX_INCLUDE_DIR="$with_sgxsdkdir/include"])
+      [SGX_INCLUDE_DIR="$SGX_SDK/include"])
+AC_ARG_VAR([SGX_TLIBC_INCLUDE_DIR],[SGX SDK TLIBC include directory])
+AS_IF([test -z "$SGX_TLIBC_INCLUDE_DIR"],
+      [SGX_TLIBC_INCLUDE_DIR="$SGX_INCLUDE_DIR/tlibc"])
 # adding SGX_INCLUDE_DIR to CFLAGS is awkward but necessary
 CFLAGS_TMP="$CFLAGS"
-CFLAGS="$CFLAGS -I$SGX_INCLUDE_DIR"
+CFLAGS="-I$SGX_INCLUDE_DIR -I$SGX_TLIBC_INCLUDE_DIR"
 AC_CHECK_HEADER(
     [sgx_error.h],
     [],
@@ -84,4 +93,11 @@ AC_CHECK_HEADER(
      #include <sgx_error.h>
      #endif])
 CFLAGS="$CFLAGS_TMP"
+
+# we need the path for SGX libraries for static linking
+# installer doesn't put these in a standard location :(
+AC_ARG_VAR([SGX_LIBS_ONLY_L],[stuff and things])
+AS_IF([test -z "$SGX_LIBS_ONLY_L"],
+      [SGX_LIBS_ONLY_L=$(pkg-config libsgx_urts_sim --libs-only-L)])
+
 AC_OUTPUT

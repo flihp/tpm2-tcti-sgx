@@ -70,9 +70,9 @@ src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.c
 
 # example application & enclave
 example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS) \
-     -I$(SGX_SDK)/include
+    $(SGX_URTS_CFLAGS)
 example_application_LDADD = $(GLIB_LIBS) $(TABRMD_LIBS) \
-    -L$(SGX_LIBRARY_PATH) -l$(URTS_LIBRARY_NAME) src/libtcti-sgx-mgr.a
+    $(SGX_URTS_LIBS) src/libtcti-sgx-mgr.a
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/application.$(OBJEXT): example/enclave_u.c
@@ -95,7 +95,7 @@ example/enclave-signed.so: example/enclave.so example/rsa3k.pem
 
 # unit tests
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) -I/opt/intel/sgxsdk/include
+    $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS)
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
