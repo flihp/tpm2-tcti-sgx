@@ -64,4 +64,24 @@ AC_PATH_PROG([SGX_EDGER8R_BIN],[sgx_edger8r],[],[$PATH:$with_sgxsdkdir/bin/x64])
 AS_IF([test -z "$SGX_EDGER8R_BIN"],
       [AC_MSG_ERROR([sgx_edger8r tool is required to build example enclave])])
 
+# check for required SGX headers, export INCLUDE path
+AC_ARG_VAR([SGX_INCLUDE_DIR],[SGX SDK include directory])
+AS_IF([test -z $SGX_INCLUDE_DIR],
+      [SGX_INCLUDE_DIR="$with_sgxsdkdir/include"])
+# adding SGX_INCLUDE_DIR to CFLAGS is awkward but necessary
+CFLAGS_TMP="$CFLAGS"
+CFLAGS="$CFLAGS -I$SGX_INCLUDE_DIR"
+AC_CHECK_HEADER(
+    [sgx_error.h],
+    [],
+    [AC_MSG_ERROR([Couldn't find or include sgx_error.h])],
+    [#include <inttypes.h>])
+AC_CHECK_HEADER(
+    [sgx_urts.h],
+    [],
+    [AC_MSG_ERROR([Couldn't find or include sgx_urts.h])],
+    [#ifdef HAVE_SGX_ERROR_H
+     #include <sgx_error.h>
+     #endif])
+CFLAGS="$CFLAGS_TMP"
 AC_OUTPUT
