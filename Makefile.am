@@ -91,7 +91,7 @@ example/rsa3k.pem:
 	openssl genrsa -3 -out $@ 3072
 
 example/enclave-signed.so: example/enclave.so example/rsa3k.pem
-	$(SGX_ENCLAVE_SIGNER) sign -key example/rsa3k.pem -enclave $< -out $@ -config example/example.config.xml
+	$(SGX_SIGN_BIN) sign -key example/rsa3k.pem -enclave $< -out $@ -config example/example.config.xml
 
 # unit tests
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \

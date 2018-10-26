@@ -54,4 +54,14 @@ AC_ARG_WITH([sgxsdkdir],
             [with_sgxsdkdir=/opt/intel/sgxsdk])
 AC_SUBST([SGX_SDK],[$with_sgxsdkdir])
 
+# check for required SGX tools
+AC_ARG_VAR([SGX_SIGN_BIN],[SGX signing tool (sgx_sign).])
+AC_PATH_PROG([SGX_SIGN_BIN],[sgx_sign],[],[$PATH:$with_sgxsdkdir/bin/x64])
+AS_IF([test -z "$SGX_SIGN_BIN"],
+      [AC_MSG_ERROR([sgx_sign tool is required to build example enclave])])
+AC_ARG_VAR([SGX_EDGER8R_BIN],[SGX signing tool (sgx_sign).])
+AC_PATH_PROG([SGX_EDGER8R_BIN],[sgx_edger8r],[],[$PATH:$with_sgxsdkdir/bin/x64])
+AS_IF([test -z "$SGX_EDGER8R_BIN"],
+      [AC_MSG_ERROR([sgx_edger8r tool is required to build example enclave])])
+
 AC_OUTPUT
