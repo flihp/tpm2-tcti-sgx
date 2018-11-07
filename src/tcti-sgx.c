@@ -53,6 +53,13 @@ tcti_sgx_transmit (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
+        return TSS2_TCTI_RC_BAD_CONTEXT;
+    }
+    if (TSS2_TCTI_VERSION (tcti_context) < 1) {
+        return TSS2_TCTI_RC_ABI_MISMATCH;
+    }
     if (TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -93,6 +100,13 @@ tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
+        return TSS2_TCTI_RC_BAD_CONTEXT;
+    }
+    if (TSS2_TCTI_VERSION (tcti_context) < 1) {
+        return TSS2_TCTI_RC_ABI_MISMATCH;
+    }
     if (TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -121,8 +135,11 @@ tcti_sgx_receive (TSS2_TCTI_CONTEXT *tcti_context,
 void
 tcti_sgx_finalize (TSS2_TCTI_CONTEXT *tcti_context)
 {
-    if (tcti_context == NULL)
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC ||
+        TSS2_TCTI_VERSION (tcti_context) < 1) {
         return;
+    }
 
     tcti_sgx_finalize_ocall (TCTI_SGX_ID (tcti_context));
 }
@@ -144,6 +161,13 @@ tcti_sgx_cancel (TSS2_TCTI_CONTEXT *tcti_context)
     sgx_status_t status;
     TSS2_RC retval;
 
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
+        return TSS2_TCTI_RC_BAD_CONTEXT;
+    }
+    if (TSS2_TCTI_VERSION (tcti_context) < 1) {
+        return TSS2_TCTI_RC_ABI_MISMATCH;
+    }
     if (TCTI_SGX_STATE (tcti_context) != READY_TO_RECEIVE)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
@@ -177,6 +201,13 @@ tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT *tcti_context,
                            TSS2_TCTI_POLL_HANDLE *handles,
                            size_t *num_handles)
 {
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
+        return TSS2_TCTI_RC_BAD_CONTEXT;
+    }
+    if (TSS2_TCTI_VERSION (tcti_context) < 1) {
+        return TSS2_TCTI_RC_ABI_MISMATCH;
+    }
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 /*
@@ -198,6 +229,13 @@ tcti_sgx_set_locality (TSS2_TCTI_CONTEXT *tcti_context,
     sgx_status_t status;
     TSS2_RC retval;
 
+    if (tcti_context == NULL ||
+        TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
+        return TSS2_TCTI_RC_BAD_CONTEXT;
+    }
+    if (TSS2_TCTI_VERSION (tcti_context) < 1) {
+        return TSS2_TCTI_RC_ABI_MISMATCH;
+    }
     if (TCTI_SGX_STATE (tcti_context) != READY_TO_TRANSMIT)
         return TSS2_TCTI_RC_BAD_SEQUENCE;
 
