@@ -60,7 +60,6 @@ CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
 
 # enclave library
 src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
-src_libtss2_tcti_sgx_a_LDLIBS  = $(ENCLAVE_LDLIBS)
 src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 
 # application library
