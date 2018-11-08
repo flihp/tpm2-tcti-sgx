@@ -78,7 +78,7 @@ example/application.$(OBJEXT): example/enclave_u.c
 
 example/.deps:
 	mkdir -p $@
-example/enclave_t.$(OBJEXT): example/enclave_t.c | example/.deps
+example/enclave_%.$(OBJEXT): example/enclave_%.c | example/.deps
 
 example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS)
 example/enclave.so: LDFLAGS+=$(ENCLAVE_LDFLAGS)
