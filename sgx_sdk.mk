@@ -1,8 +1,3 @@
-### we don't use -nostdinc here so we can get TPM2 types ###
-### should probably have a set of flags for compiling libraries for use by SGX
-### enclaves and a set for the enclave itself
-ENCLAVE_CFLAGS = -O0 -fvisibility=hidden \
-    -fpie -fstack-protector -I$(SGX_INCLUDE_DIR)  -I$(SGX_INCLUDE_DIR)/tlibc
 ENCLAVE_LDFLAGS = -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles \
     $(SGX_LIBS_ONLY_L) -Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
     -Wl,-pie,-eenclave_entry -Wl,--export-dynamic -Wl,--defsym,__ImageBase=0 \

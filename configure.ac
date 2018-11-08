@@ -94,6 +94,29 @@ AC_CHECK_HEADER(
      #endif])
 CFLAGS="$CFLAGS_TMP"
 
+dnl ADD_COMPILER_FLAG:
+dnl   A macro to add a compiler flags to the provided variable. This macro
+dnl   will check to be sure the compiler supports the flag. Unsupported
+dnl   flags will cause the configure script to fail.
+dnl $1: C compiler flag to check and add.
+dnl $2: Add flags to this variable.
+AC_DEFUN(
+    [ADD_COMPILER_FLAG],
+    [AX_CHECK_COMPILE_FLAG(
+        [$1],
+        [
+            $2="$$2 $1"
+            AC_SUBST([$2])
+        ],
+        [AC_MSG_ERROR([Unsupported compile flag: $1])],
+        [-Werror]
+    )]
+)
+# CFLAGS used when building code that runs in the enclave
+ADD_COMPILER_FLAG([-fvisibility=hidden],[ENCLAVE_CFLAGS])
+ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
+ADD_COMPILER_FLAG([-fstack-protector],[ENCLAVE_CFLAGS])
+
 # we need the path for SGX libraries for static linking
 # installer doesn't put these in a standard location :(
 AC_ARG_VAR([SGX_LIBS_ONLY_L],[stuff and things])

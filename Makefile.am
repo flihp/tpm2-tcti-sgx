@@ -4,6 +4,7 @@ include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
+ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \
     example/enclave_t.h \
     example/enclave_t.c \
