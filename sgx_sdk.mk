@@ -1,7 +1,3 @@
-ENCLAVE_LDFLAGS = -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles \
-    $(SGX_LIBS_ONLY_L) -Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
-    -Wl,-pie,-eenclave_entry -Wl,--export-dynamic -Wl,--defsym,__ImageBase=0 \
-    -Wl,-fuse-ld=gold -Wl,--rosegment
 ENCLAVE_LDLIBS = -Wl,--whole-archive -l$(SGX_TRTS_LIB) \
     -Wl,--no-whole-archive -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto \
     -l$(SGX_TSERVICE_LIB) -Wl,--end-group

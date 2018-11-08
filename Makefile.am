@@ -82,7 +82,7 @@ example/.deps:
 example/enclave_%.$(OBJEXT): example/enclave_%.c | example/.deps
 
 example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS)
-example/enclave.so: LDFLAGS+=$(ENCLAVE_LDFLAGS)
+example/enclave.so: LDFLAGS+=$(SGX_LIBS_ONLY_L) $(ENCLAVE_LDFLAGS)
 example/enclave.so: LDLIBS+=$(ENCLAVE_LDLIBS)
 example/enclave.so: example/enclave_t.$(OBJEXT) example/enclave.$(OBJEXT) src/libtss2-tcti-sgx.a
 	$(CC) $(LDFLAGS) $^ -o $@ -Bstatic $(LDLIBS)

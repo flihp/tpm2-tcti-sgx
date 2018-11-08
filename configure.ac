@@ -117,6 +117,30 @@ ADD_COMPILER_FLAG([-fvisibility=hidden],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fstack-protector],[ENCLAVE_CFLAGS])
 
+AC_DEFUN(
+    [ADD_LINK_FLAG],
+    [AX_CHECK_LINK_FLAG(
+        [$1],
+        [
+            $2="$$2 $1"
+            AC_SUBST([$2])
+        ],
+        [AC_MSG_ERROR([Unsupported link flag: $1])],
+        [-Werror -Wl,-fuse-ld=gold]
+    )]
+)
+ADD_LINK_FLAG([-Wl,--no-undefined],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-nostdlib],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-nostartfiles],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Bstatic],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,--no-undefined],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,-pie],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,-eenclave_entry],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,--export-dynamic],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,--defsym,__ImageBase=0],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,-fuse-ld=gold],[ENCLAVE_LDFLAGS])
+ADD_LINK_FLAG([-Wl,--rosegment],[ENCLAVE_LDFLAGS])
+
 # we need the path for SGX libraries for static linking
 # installer doesn't put these in a standard location :(
 AC_ARG_VAR([SGX_LIBS_ONLY_L],[stuff and things])
