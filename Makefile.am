@@ -6,10 +6,13 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \
+    example/enclave-signed.so \
+    example/enclave.so \
     example/enclave_t.h \
     example/enclave_t.c \
     example/enclave_u.h \
-    example/enclave_u.c
+    example/enclave_u.c \
+    example/rsa3k.pem
 
 BUILT_SOURCES = $(CLEANFILES)
 
@@ -39,6 +42,9 @@ libtcti_sgx_mgrdir = $(includedir)
 libtcti_sgx_mgr_HEADERS = $(srcdir)/src/include/tcti-sgx-mgr.h
 
 EXTRA_DIST = \
+    example/enclave.c \
+    example/enclave.edl \
+    example/example.config.xml \
     src/include/tcti-sgx_priv.h \
     src/tss2_tcti_sgx.edl \
     test/tcti-sgx-common.h \
