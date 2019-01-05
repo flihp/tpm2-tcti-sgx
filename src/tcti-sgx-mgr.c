@@ -13,6 +13,7 @@
 
 #include <tss2/tss2_tcti.h>
 
+#include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
 
 #define RAND_SRC "/dev/urandom"
@@ -47,29 +48,28 @@ static tcti_sgx_mgr_t *mgr_global = NULL;
  * instance used to communicate with the 'downstream' TPM. This allows for
  * flexible configuration by the application hosting the enclave.
  */
-tcti_sgx_mgr_t*
+int
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    gpointer user_data)
 {
     if (mgr_global != NULL) {
         printf ("already initialized\n");
-        return NULL;
+        return 0;
     }
     if (callback == NULL) {
         printf ("callback parameter is required\n");
-        return NULL;
+        return 1;
     }
     mgr_global = calloc (1, sizeof (tcti_sgx_mgr_t));
     if (mgr_global == NULL) {
         perror ("calloc");
-        goto out;
+        return 1;
     }
     mgr_global->init_cb = callback;
     mgr_global->user_data = user_data;
     g_mutex_init (&mgr_global->session_table_mutex);
     mgr_global->session_table = g_hash_table_new (g_int64_hash, g_int64_equal);
-out:
-    return mgr_global;
+    return 0;
 }
 
 void

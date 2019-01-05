@@ -48,7 +48,7 @@ main (int argc,
         return 1;
     }
 
-    if (tcti_sgx_mgr_init (tcti_init_cb, "bus_type=session") == NULL) {
+    if (tcti_sgx_mgr_init (tcti_init_cb, "bus_type=session") == 1) {
         printf ("%s: failed to initialize SGX TCTI Mgr\n", __func__);
         return 1;
     }

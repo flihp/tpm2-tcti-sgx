@@ -4,12 +4,14 @@
  */
 #include <errno.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
 
 enum calloc_flag {
@@ -33,7 +35,7 @@ __wrap_calloc (size_t nmemb,
         printf ("%s: invoking 'real' calloc\n", __func__);
         return __real_calloc (nmemb, size);
     default:
-        assert_true (FALSE);
+        assert_true (false);
     }
 }
 
@@ -86,8 +88,7 @@ static int
 tcti_sgx_mgr_init_setup (void **state)
 {
     will_return (__wrap_calloc, passthrough);
-    *state = tcti_sgx_mgr_init (callback, NULL);
-    return 0;
+    return tcti_sgx_mgr_init (callback, NULL);
 }
 
 #define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
@@ -101,8 +102,7 @@ static int
 tcti_sgx_mgr_init_setup_ctx (void **state)
 {
     will_return (__wrap_calloc, passthrough);
-    *state = tcti_sgx_mgr_init (callback_ctx, NULL);
-    return 0;
+    return tcti_sgx_mgr_init (callback_ctx, NULL);
 }
 
 static int
@@ -115,34 +115,35 @@ tcti_sgx_mgr_init_teardown (void **state)
 static void
 tcti_sgx_mgr_init_null_callback (void **state)
 {
-    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (NULL, NULL);
-    assert_null (mgr);
+    int ret = tcti_sgx_mgr_init (NULL, NULL);
+    assert_int_equal (ret, 1);
 }
 
 static void
 tcti_sgx_mgr_init_calloc_fail (void **state)
 {
+    int ret;
+
     will_return (__wrap_calloc, null);
-    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (callback, NULL);
-    assert_null (mgr);
+    ret = tcti_sgx_mgr_init (callback, NULL);
+    assert_int_equal (ret, 1);
 }
 
 static void
 tcti_sgx_mgr_init_null_data (void **state)
 {
-    will_return (__wrap_calloc, passthrough);
+    int ret;
 
-    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (callback, NULL);
-    assert_non_null (mgr);
-    assert_int_equal (mgr->init_cb, callback);
-    assert_null (mgr->user_data);
+    will_return (__wrap_calloc, passthrough);
+    ret = tcti_sgx_mgr_init (callback, NULL);
+    assert_int_equal (ret, 0);
 }
 
 static void
 tcti_sgx_mgr_init_twice (void **state)
 {
-    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (callback, NULL);
-    assert_null (mgr);
+    int ret = tcti_sgx_mgr_init (callback, NULL);
+    assert_int_equal (ret, 0);
 }
 
 static void
@@ -216,7 +217,7 @@ tcti_sgx_mgr_init_ocall_insert_fail (void **state)
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
-    will_return (__wrap_g_hash_table_insert, FALSE);
+    will_return (__wrap_g_hash_table_insert, false);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, 0);
 }
@@ -230,7 +231,7 @@ tcti_sgx_mgr_init_ocall_success (void **state)
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
-    will_return (__wrap_g_hash_table_insert, TRUE);
+    will_return (__wrap_g_hash_table_insert, true);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, TEST_ID);
 }

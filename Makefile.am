@@ -47,6 +47,7 @@ EXTRA_DIST = \
     example/enclave.edl \
     example/example.config.xml \
     src/include/tcti-sgx_priv.h \
+    src/include/tcti-sgx-mgr_priv.h \
     src/tss2_tcti_sgx.edl \
     test/tcti-sgx-common.h \
     AUTHORS \

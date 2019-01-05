@@ -10,6 +10,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
 
 gpointer
@@ -66,19 +67,13 @@ test_tcti_cb (void *user_data)
 static int
 tcti_transmit_setup( void **state)
 {
-    tcti_sgx_mgr_t *mgr = tcti_sgx_mgr_init (test_tcti_cb, NULL);
-    *state = mgr;
-    return 0;
+    return tcti_sgx_mgr_init (test_tcti_cb, NULL);
 }
 
 static int
 tcti_teardown (void **state)
 {
-    tcti_sgx_mgr_t *mgr = (tcti_sgx_mgr_t*)*state;
-    if (mgr != NULL) {
-        tcti_sgx_mgr_finalize ();
-        *state = NULL;
-    }
+    tcti_sgx_mgr_finalize ();
     return 0;
 }
 
