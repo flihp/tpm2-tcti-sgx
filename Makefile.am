@@ -105,49 +105,42 @@ example/enclave-signed.so: example/enclave.so example/rsa3k.pem
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
-    $(CODE_COVERAGE_LIBS)
+    $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_init_param_tests_SOURCES = \
     test/tcti-sgx-init-param-tests.c \
-    test/tcti-sgx_null-wraps.c \
-    src/tcti-sgx.c
+    test/tcti-sgx_null-wraps.c
 
 test_tcti_sgx_mgr_init_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
-test_tcti_sgx_mgr_init_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS)
+test_tcti_sgx_mgr_init_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) src/libtcti-sgx-mgr.a
 test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
     -Wl,--wrap=read,--wrap=g_hash_table_insert
-test_tcti_sgx_mgr_init_tests_SOURCES = \
-    test/tcti-sgx-mgr-init-tests.c \
-    src/tcti-sgx-mgr.c
+test_tcti_sgx_mgr_init_tests_SOURCES = test/tcti-sgx-mgr-init-tests.c
 
 test_tcti_sgx_mgr_ocall_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
-test_tcti_sgx_mgr_ocall_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS)
+test_tcti_sgx_mgr_ocall_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) src/libtcti-sgx-mgr.a
 test_tcti_sgx_mgr_ocall_tests_LDFLAGS = -Wl,--wrap=g_hash_table_lookup
-test_tcti_sgx_mgr_ocall_tests_SOURCES = \
-    test/tcti-sgx-mgr-ocall-tests.c \
-    src/tcti-sgx-mgr.c
+test_tcti_sgx_mgr_ocall_tests_SOURCES = test/tcti-sgx-mgr-ocall-tests.c
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
-test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
+test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
 test_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_struct_tests_SOURCES = \
     test/tcti-sgx-struct-tests.c \
     test/tcti-sgx_null-wraps.c \
-    test/tcti-sgx-common.c \
-    src/tcti-sgx.c
+    test/tcti-sgx-common.c
 
 test_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) 
-test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
+test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
 test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_call_tests_SOURCES = \
     test/tcti-sgx-call-tests.c \
     test/tcti-sgx_null-wraps.c \
-    test/tcti-sgx-common.c \
-    src/tcti-sgx.c
+    test/tcti-sgx-common.c
 
 AUTHORS :
 	git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort | \
