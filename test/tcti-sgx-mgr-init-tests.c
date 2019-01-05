@@ -97,7 +97,6 @@ callback_ctx (void *user_data)
     return TEST_CTX;
 }
 
-#define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
 static int
 tcti_sgx_mgr_init_setup_ctx (void **state)
 {
