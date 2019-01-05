@@ -4,7 +4,7 @@ VPATH = $(srcdir) $(builddir)
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -I$(srcdir)/src/include -fPIC
+AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -fPIC
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \
     example/enclave-signed.so \
@@ -37,17 +37,17 @@ TESTS = $(check_PROGRAMS)
 
 # headers and where to install them
 libtss2_tcti_sgxdir = $(includedir)/tss2
-libtss2_tcti_sgx_HEADERS = $(srcdir)/src/include/tss2-tcti-sgx.h
+libtss2_tcti_sgx_HEADERS = $(srcdir)/src/tss2-tcti-sgx.h
 
 libtcti_sgx_mgrdir = $(includedir)
-libtcti_sgx_mgr_HEADERS = $(srcdir)/src/include/tcti-sgx-mgr.h
+libtcti_sgx_mgr_HEADERS = $(srcdir)/src/tcti-sgx-mgr.h
 
 EXTRA_DIST = \
     example/enclave.c \
     example/enclave.edl \
     example/example.config.xml \
-    src/include/tcti-sgx_priv.h \
-    src/include/tcti-sgx-mgr_priv.h \
+    src/tcti-sgx_priv.h \
+    src/tcti-sgx-mgr_priv.h \
     src/tss2_tcti_sgx.edl \
     test/tcti-sgx-common.h \
     AUTHORS \

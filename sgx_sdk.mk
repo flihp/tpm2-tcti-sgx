@@ -3,7 +3,7 @@ ENCLAVE_LDLIBS = -Wl,--whole-archive -l$(SGX_TRTS_LIB) \
     -l$(SGX_TSERVICE_LIB) -Wl,--end-group
 
 ENCLAVE_SEARCH_PATH = --search-path $(srcdir)/src \
-    --search-path $(srcdir)/src/include --search-path $(SGX_INCLUDE_DIR)
+    --search-path $(SGX_INCLUDE_DIR)
 
 %_u.h %_u.c : %.edl
 	$(SGX_EDGER8R_BIN) --untrusted $(ENCLAVE_SEARCH_PATH) --untrusted-dir ${subst $(srcdir),$(builddir),$(dir $^)} $^
