@@ -1,5 +1,6 @@
 # Copyright 2016 - 2018, Intel Corporation
 # SPDX-License-Identifier: BSD-2-Clause
+VPATH = $(srcdir) $(builddir)
 include sgx_sdk.mk
 
 ACLOCAL_AMFLAGS = -I m4
@@ -76,7 +77,7 @@ src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.c
 
 # example application & enclave
 example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS) \
-    $(SGX_URTS_CFLAGS)
+    $(SGX_URTS_CFLAGS) -I$(builddir)/example
 example_application_LDADD = $(GLIB_LIBS) $(TABRMD_LIBS) \
     $(SGX_URTS_LIBS) src/libtcti-sgx-mgr.a
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
@@ -87,7 +88,7 @@ example/.deps:
 	mkdir -p $@
 example/enclave_%.$(OBJEXT): example/enclave_%.c | example/.deps
 
-example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS)
+example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS) -I$(builddir)/example
 example/enclave.so: LDFLAGS+=$(SGX_LIBS_ONLY_L) $(ENCLAVE_LDFLAGS)
 example/enclave.so: LDLIBS+=$(ENCLAVE_LDLIBS)
 example/enclave.so: example/enclave_t.$(OBJEXT) example/enclave.$(OBJEXT) src/libtss2-tcti-sgx.a
