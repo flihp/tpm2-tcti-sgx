@@ -60,7 +60,7 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
         printf ("callback parameter is required\n");
         return 1;
     }
-    mgr_global = calloc (1, sizeof (tcti_sgx_mgr_t));
+    mgr_global = (tcti_sgx_mgr_t*)calloc (1, sizeof (tcti_sgx_mgr_t));
     if (mgr_global == NULL) {
         perror ("calloc");
         return 1;
@@ -102,7 +102,7 @@ tcti_sgx_init_ocall ()
                 __func__, RAND_SRC, strerror (errno));
         return 0;
     }
-    session = calloc (1, sizeof (tcti_sgx_session_t));
+    session = (tcti_sgx_session_t*)calloc (1, sizeof (tcti_sgx_session_t));
     if (session == NULL) {
         printf ("%s: failed to allocate memory for session structure: %s",
                 __func__, strerror (errno));
@@ -145,7 +145,7 @@ tcti_sgx_transmit_ocall (uint64_t id,
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -171,7 +171,7 @@ tcti_sgx_receive_ocall (uint64_t id,
         return TSS2_TCTI_RC_BAD_VALUE;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -191,7 +191,7 @@ tcti_sgx_finalize_ocall (uint64_t id)
     tcti_sgx_session_t *session;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return;
@@ -207,7 +207,7 @@ tcti_sgx_cancel_ocall (uint64_t id)
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -233,7 +233,7 @@ tcti_sgx_set_locality_ocall (uint64_t id,
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;

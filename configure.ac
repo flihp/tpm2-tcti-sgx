@@ -6,6 +6,7 @@ AC_INIT([tpm2-tcti-sgx],
         [],
         [https://example.org/tpm2-tcti-sgx])
 AC_PROG_CC
+AC_PROG_CXX
 LT_INIT
 AM_INIT_AUTOMAKE([subdir-objects] [-Wno-portability])
 AC_CONFIG_FILES([Makefile])

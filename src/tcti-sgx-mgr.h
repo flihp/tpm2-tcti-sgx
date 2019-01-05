@@ -10,10 +10,17 @@
 #include <tss2/tss2_tpm2_types.h>
 #include <tss2/tss2_tcti.h>
 
+#if defined (__cplusplus)
+extern "C" {
+#endif
+
 typedef TSS2_TCTI_CONTEXT* (*downstream_tcti_init_cb) (void *user_data);
 
 int tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                        void *user_data);
 void tcti_sgx_mgr_finalize (void);
 
+#if defined (__cplusplus)
+}
+#endif
 #endif
