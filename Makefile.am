@@ -19,6 +19,7 @@ BUILT_SOURCES = $(CLEANFILES)
 
 # things we're building
 lib_LIBRARIES = src/libtcti-sgx-mgr.a src/libtss2-tcti-sgx.a
+noinst_LIBRARIES = test/libtest.a
 noinst_PROGRAMS = example/application
 
 all-local: \
@@ -102,14 +103,15 @@ example/enclave-signed.so: example/enclave.so example/rsa3k.pem
 	$(SGX_SIGN_BIN) sign -key example/rsa3k.pem -enclave $< -out $@ -config $(srcdir)/example/example.config.xml
 
 # unit tests
+test_libtest_a_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+test_libtest_a_SOURCES = test/tcti-sgx_null-wraps.c test/tcti-sgx-common.c
+
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
-    $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
+    $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a test/libtest.a
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tcti_sgx_init_param_tests_SOURCES = \
-    test/tcti-sgx-init-param-tests.c \
-    test/tcti-sgx_null-wraps.c
+test_tcti_sgx_init_param_tests_SOURCES = test/tcti-sgx-init-param-tests.c
 
 test_tcti_sgx_mgr_init_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
@@ -126,21 +128,17 @@ test_tcti_sgx_mgr_ocall_tests_SOURCES = test/tcti-sgx-mgr-ocall-tests.c
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
-test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
+test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) \
+    src/libtcti-sgx-mgr.a test/libtest.a
 test_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tcti_sgx_struct_tests_SOURCES = \
-    test/tcti-sgx-struct-tests.c \
-    test/tcti-sgx_null-wraps.c \
-    test/tcti-sgx-common.c
+test_tcti_sgx_struct_tests_SOURCES = test/tcti-sgx-struct-tests.c
 
 test_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) 
-test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) src/libtcti-sgx-mgr.a
+test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) \
+    src/libtcti-sgx-mgr.a test/libtest.a
 test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
-test_tcti_sgx_call_tests_SOURCES = \
-    test/tcti-sgx-call-tests.c \
-    test/tcti-sgx_null-wraps.c \
-    test/tcti-sgx-common.c
+test_tcti_sgx_call_tests_SOURCES = test/tcti-sgx-call-tests.c
 
 AUTHORS :
 	git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort | \
