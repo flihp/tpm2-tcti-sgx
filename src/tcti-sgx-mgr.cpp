@@ -6,7 +6,6 @@
 #include <fcntl.h>
 #include <glib.h>
 #include <inttypes.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -15,6 +14,10 @@
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
+
+#include <iostream>
+
+using namespace std;
 
 #define RAND_SRC "/dev/urandom"
 
@@ -53,11 +56,11 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    gpointer user_data)
 {
     if (mgr_global != NULL) {
-        printf ("already initialized\n");
+        cout << "already initialized" << endl;
         return 0;
     }
     if (callback == NULL) {
-        printf ("callback parameter is required\n");
+        cout << "callback parameter is required" <<  endl;
         return 1;
     }
     mgr_global = (tcti_sgx_mgr_t*)calloc (1, sizeof (tcti_sgx_mgr_t));
@@ -93,31 +96,31 @@ tcti_sgx_init_ocall ()
     gboolean insert_result;
 
     if (mgr_global == NULL) {
-        printf ("%s: tcti_sgx_mgr not initialized\n", __func__);
+        cout << __func__ << ": tcti_sgx_mgr not initialized" << endl;
         return 0;
     }
     fd = open (RAND_SRC, O_RDONLY);
     if (fd == -1) {
-        printf ("%s: failed to open %s: %s",
-                __func__, RAND_SRC, strerror (errno));
+        cout << __func__ << ": failed to open " << RAND_SRC << ": "
+            << strerror (errno) << endl;
         return 0;
     }
     session = (tcti_sgx_session_t*)calloc (1, sizeof (tcti_sgx_session_t));
     if (session == NULL) {
-        printf ("%s: failed to allocate memory for session structure: %s",
-                __func__, strerror (errno));
+        cout << __func__ << ": failed to allocate memory for session structure: "
+            << strerror (errno) << endl;
         return 0;
     }
     if (read (fd, &session->id, sizeof (session->id)) != sizeof (session->id))
     {
-        printf ("%s: failed to read %d bytes from %s: %s",
-                __func__, sizeof (session->id), RAND_SRC, strerror (errno));
+        cout << __func__ << ": failed to read " << sizeof (session->id)
+            << " bytes from " << RAND_SRC << ": " << strerror (errno) << endl;
         free (session);
         return 0;
     }
     session->tcti_context = mgr_global->init_cb (mgr_global->user_data);
     if (session->tcti_context == NULL) {
-        printf ("%s: tcti init callback failed to create a TCTI\n", __func__);
+        cout << __func__ << ": tcti init callback failed to create a TCTI" << endl;
         free (session);
         return 0;
     }
@@ -127,7 +130,7 @@ tcti_sgx_init_ocall ()
                                          &session->id,
                                          session);
     if (insert_result != TRUE) {
-        printf ("%s: failed to insert session into session table\n", __func__);
+        cout << __func__ << ": failed to insert session into session table" << endl;
         g_mutex_unlock (&mgr_global->session_table_mutex);
         free (session);
         return 0;

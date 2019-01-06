@@ -80,8 +80,9 @@ src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.cpp
 # example application & enclave
 example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS) \
     $(SGX_URTS_CFLAGS) -I$(builddir)/example
-example_application_LDADD = $(GLIB_LIBS) $(TABRMD_LIBS) \
-    $(SGX_URTS_LIBS) src/libtcti-sgx-mgr.a
+example_application_LDADD = src/libtcti-sgx-mgr.a $(GLIB_LIBS) $(TABRMD_LIBS) \
+    $(SGX_URTS_LIBS)
+example_application_LDFLAGS = -lstdc++
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/application.$(OBJEXT): example/enclave_u.c
@@ -108,35 +109,37 @@ test_libtest_a_SOURCES = test/tcti-sgx_null-wraps.c test/tcti-sgx-common.c
 
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
-test_tcti_sgx_init_param_tests_LDADD   = $(CMOCKA_LIBS) \
-    $(CODE_COVERAGE_LIBS) src/libtss2-tcti-sgx.a src/libtcti-sgx-mgr.a test/libtest.a
+test_tcti_sgx_init_param_tests_LDADD = src/libtss2-tcti-sgx.a \
+    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_init_param_tests_SOURCES = test/tcti-sgx-init-param-tests.c
 
 test_tcti_sgx_mgr_init_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
-test_tcti_sgx_mgr_init_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) src/libtcti-sgx-mgr.a
+test_tcti_sgx_mgr_init_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
+    $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) -lstdc++
 test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
     -Wl,--wrap=read,--wrap=g_hash_table_insert
 test_tcti_sgx_mgr_init_tests_SOURCES = test/tcti-sgx-mgr-init-tests.c
 
 test_tcti_sgx_mgr_ocall_tests_CFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
-test_tcti_sgx_mgr_ocall_tests_LDADD = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) src/libtcti-sgx-mgr.a
+test_tcti_sgx_mgr_ocall_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
+    $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) -lstdc++
 test_tcti_sgx_mgr_ocall_tests_LDFLAGS = -Wl,--wrap=g_hash_table_lookup
 test_tcti_sgx_mgr_ocall_tests_SOURCES = test/tcti-sgx-mgr-ocall-tests.c
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
-test_tcti_sgx_struct_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) \
-    src/libtss2-tcti-sgx.a src/libtcti-sgx-mgr.a test/libtest.a
+test_tcti_sgx_struct_tests_LDADD = src/libtss2-tcti-sgx.a \
+    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_struct_tests_SOURCES = test/tcti-sgx-struct-tests.c
 
 test_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) 
-test_tcti_sgx_call_tests_LDADD   = $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) \
-    src/libtss2-tcti-sgx.a src/libtcti-sgx-mgr.a test/libtest.a
+test_tcti_sgx_call_tests_LDADD = src/libtss2-tcti-sgx.a test/libtest.a \
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_call_tests_SOURCES = test/tcti-sgx-call-tests.c
 
