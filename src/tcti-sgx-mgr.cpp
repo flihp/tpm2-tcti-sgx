@@ -45,6 +45,52 @@ using namespace std;
  */
 static tcti_sgx_mgr_t *mgr_global = NULL;
 
+TctiSgxSession::TctiSgxSession (uint64_t id,
+                                TSS2_TCTI_CONTEXT *tcti_context)
+: tcti_context (tcti_context), id (id)
+{
+    g_mutex_init (&mutex);
+}
+
+TctiSgxSession::~TctiSgxSession ()
+{
+    Tss2_Tcti_Finalize (this->tcti_context);
+    g_mutex_clear (&this->mutex);
+    free (this->tcti_context);
+}
+
+void
+TctiSgxSession::lock ()
+{
+    g_mutex_lock (&this->mutex);
+}
+void
+TctiSgxSession::unlock ()
+{
+    g_mutex_unlock (&this->mutex);
+}
+
+TSS2_RC
+TctiSgxSession::transmit (size_t size, uint8_t const *command)
+{
+    return Tss2_Tcti_Transmit (this->tcti_context, size, command);
+}
+TSS2_RC
+TctiSgxSession::receive (size_t *size, uint8_t *response, int32_t timeout)
+{
+    return Tss2_Tcti_Receive (this->tcti_context, size, response, timeout);
+}
+TSS2_RC
+TctiSgxSession::cancel ()
+{
+    return Tss2_Tcti_Cancel (this->tcti_context);
+}
+TSS2_RC
+TctiSgxSession::set_locality (uint8_t locality)
+{
+    return Tss2_Tcti_SetLocality (this->tcti_context, locality);
+}
+
 /*
  * Function to initialize the application / untrusted library. The 'callback'
  * parameter is a caller provided function used to initialize a TCTI
@@ -91,9 +137,11 @@ tcti_sgx_mgr_finalize (void)
 uint64_t
 tcti_sgx_init_ocall ()
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     gint fd;
     gboolean insert_result;
+    uint64_t id;
+    TSS2_TCTI_CONTEXT *tcti_context;
 
     if (mgr_global == NULL) {
         cout << __func__ << ": tcti_sgx_mgr not initialized" << endl;
@@ -105,26 +153,18 @@ tcti_sgx_init_ocall ()
             << strerror (errno) << endl;
         return 0;
     }
-    session = (tcti_sgx_session_t*)calloc (1, sizeof (tcti_sgx_session_t));
-    if (session == NULL) {
-        cout << __func__ << ": failed to allocate memory for session structure: "
-            << strerror (errno) << endl;
-        return 0;
-    }
-    if (read (fd, &session->id, sizeof (session->id)) != sizeof (session->id))
+    if (read (fd, &id, sizeof (id)) != sizeof (id))
     {
         cout << __func__ << ": failed to read " << sizeof (session->id)
             << " bytes from " << RAND_SRC << ": " << strerror (errno) << endl;
-        free (session);
         return 0;
     }
-    session->tcti_context = mgr_global->init_cb (mgr_global->user_data);
-    if (session->tcti_context == NULL) {
+    tcti_context = mgr_global->init_cb (mgr_global->user_data);
+    if (tcti_context == NULL) {
         cout << __func__ << ": tcti init callback failed to create a TCTI" << endl;
-        free (session);
         return 0;
     }
-    g_mutex_init (&session->mutex);
+    session = new TctiSgxSession (id, tcti_context);
     g_mutex_lock (&mgr_global->session_table_mutex);
     insert_result = g_hash_table_insert (mgr_global->session_table,
                                          &session->id,
@@ -144,19 +184,17 @@ tcti_sgx_transmit_ocall (uint64_t id,
                          size_t size,
                          const uint8_t *command)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (&session->mutex);
-    ret = Tss2_Tcti_Transmit (session->tcti_context,
-                              size,
-                              command);
-    g_mutex_unlock (&session->mutex);
+    session->lock ();
+    ret = session->transmit (size, command);
+    session->unlock ();
     return ret;
 }
 
@@ -166,7 +204,7 @@ tcti_sgx_receive_ocall (uint64_t id,
                         uint8_t *response,
                         uint32_t timeout)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     TSS2_RC ret;
 
     /* we only support blocking calls currently */
@@ -174,16 +212,13 @@ tcti_sgx_receive_ocall (uint64_t id,
         return TSS2_TCTI_RC_BAD_VALUE;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (&session->mutex);
-    ret = Tss2_Tcti_Receive (session->tcti_context,
-                             &size,
-                             response,
-                             timeout);
-    g_mutex_unlock (&session->mutex);
+    session->lock ();
+    ret = session->receive (&size, response, timeout);
+    session->unlock ();
 
     return ret;
 }
@@ -191,32 +226,30 @@ tcti_sgx_receive_ocall (uint64_t id,
 void
 tcti_sgx_finalize_ocall (uint64_t id)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return;
-    g_mutex_lock (&session->mutex);
-    Tss2_Tcti_Finalize (session->tcti_context);
-    g_mutex_unlock (&session->mutex);
+    delete session;
 }
 
 TSS2_RC
 tcti_sgx_cancel_ocall (uint64_t id)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (&session->mutex);
-    ret = Tss2_Tcti_Cancel (session->tcti_context);
-    g_mutex_unlock (&session->mutex);
+    session->lock ();
+    ret = session->cancel ();
+    session->unlock ();
     return ret;
 }
 
@@ -232,16 +265,16 @@ TSS2_RC
 tcti_sgx_set_locality_ocall (uint64_t id,
                              uint8_t locality)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     TSS2_RC ret;
 
     g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (tcti_sgx_session_t*)g_hash_table_lookup (mgr_global->session_table, &id);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
     g_mutex_unlock (&mgr_global->session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
-    g_mutex_lock (&session->mutex);
-    ret = Tss2_Tcti_SetLocality (session->tcti_context, locality);
-    g_mutex_unlock (&session->mutex);
+    session->lock ();
+    ret = session->set_locality (locality);
+    session->unlock ();
     return ret;
 }

@@ -37,6 +37,7 @@ example/enclave_t.*
 example/enclave_u.*
 test/*
 !test/*.c
+!test/*.cpp
 !test/*.h
 AUTHORS
 VERSION

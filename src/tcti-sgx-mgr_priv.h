@@ -9,10 +9,6 @@
 
 #include "tcti-sgx-mgr.h"
 
-#if defined (__cplusplus)
-extern "C" {
-#endif
-
 typedef struct tcti_sgx_mgr {
     downstream_tcti_init_cb  init_cb;
     gpointer user_data;
@@ -20,11 +16,25 @@ typedef struct tcti_sgx_mgr {
     GMutex session_table_mutex;
 } tcti_sgx_mgr_t;
 
-typedef struct tcti_sgx_session {
-    uint64_t id;
+class TctiSgxSession {
     TSS2_TCTI_CONTEXT *tcti_context;
     GMutex mutex;
-} tcti_sgx_session_t;
+public:
+    uint64_t id;
+    TctiSgxSession (uint64_t id,
+                    TSS2_TCTI_CONTEXT *tcti_context);
+    ~TctiSgxSession ();
+    void lock ();
+    void unlock ();
+    TSS2_RC transmit (size_t size, uint8_t const *command);
+    TSS2_RC receive (size_t *size, uint8_t *response, int32_t timeout);
+    TSS2_RC cancel ();
+    TSS2_RC set_locality (uint8_t locality);
+};
+
+#if defined (__cplusplus)
+extern "C" {
+#endif
 
 uint64_t tcti_sgx_init_ocall ();
 TSS2_RC tcti_sgx_transmit_ocall (uint64_t id,

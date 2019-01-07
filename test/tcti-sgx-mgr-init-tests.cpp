@@ -9,7 +9,10 @@
 #include <string.h>
 
 #include <setjmp.h>
+
+extern "C" {
 #include <cmocka.h>
+}
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
@@ -19,9 +22,33 @@ enum calloc_flag {
     passthrough
 };
 
+extern "C" {
 void*
 __real_calloc (size_t nmemb,
                size_t size);
+void*
+__wrap_calloc (size_t nmemb,
+               size_t size);
+int
+__real_open (const char *pathname,
+             int flags);
+int
+__wrap_open (const char *pathname,
+             int flags);
+ssize_t
+__real_read (int fd,
+             void *buf,
+             size_t count);
+ssize_t
+__wrap_read (int fd,
+             void *buf,
+             size_t count);
+gboolean
+__wrap_g_hash_table_insert (GHashTable *hash_table,
+                            gpointer key,
+                            gpointer value);
+}
+
 void*
 __wrap_calloc (size_t nmemb,
                size_t size)
@@ -40,9 +67,6 @@ __wrap_calloc (size_t nmemb,
 }
 
 int
-__real_open (const char *pathname,
-             int flags);
-int
 __wrap_open (const char *pathname,
              int flags)
 {
@@ -58,19 +82,17 @@ __wrap_open (const char *pathname,
 
 #define TEST_FD 0xa3c18ae2
 ssize_t
-__real_read (int fd,
-             void *buf,
-             size_t count);
-ssize_t
 __wrap_read (int fd,
              void *buf,
              size_t count)
 {
+    uint64_t id;
+
     if (fd == TEST_FD) {
-        tcti_sgx_session_t *session = (tcti_sgx_session_t*)buf;
         printf ("%s: mock read\n", __func__);
         errno = mock_type (int);
-        session->id = mock_type (uint64_t);
+        id = mock_type (uint64_t);
+        memcpy (buf, &id, sizeof (id));
         return mock_type (ssize_t);
     } else {
         printf ("%s: real read\n", __func__);
@@ -163,21 +185,10 @@ tcti_sgx_mgr_init_ocall_open_fail (void **state)
 }
 
 static void
-tcti_sgx_mgr_init_ocall_calloc_fail (void **state)
-{
-     will_return (__wrap_open, 0);
-     will_return (__wrap_open, TEST_FD);
-     will_return (__wrap_calloc, null);
-     uint64_t id = tcti_sgx_init_ocall ();
-     assert_int_equal (id, 0);
-}
-
-static void
 tcti_sgx_mgr_init_ocall_read_fail (void **state)
 {
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
-    will_return (__wrap_calloc, passthrough);
     will_return (__wrap_read, EACCES);
     will_return (__wrap_read, 0);
     will_return (__wrap_read, -1);
@@ -191,7 +202,6 @@ tcti_sgx_mgr_init_ocall_cb_fail (void **state)
 {
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
-    will_return (__wrap_calloc, passthrough);
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
@@ -213,7 +223,6 @@ tcti_sgx_mgr_init_ocall_insert_fail (void **state)
 {
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
-    will_return (__wrap_calloc, passthrough);
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
@@ -227,7 +236,6 @@ tcti_sgx_mgr_init_ocall_success (void **state)
 {
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
-    will_return (__wrap_calloc, passthrough);
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
@@ -251,9 +259,6 @@ main (void)
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test (tcti_sgx_mgr_init_ocall_no_init),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_open_fail,
-                                         tcti_sgx_mgr_init_setup,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_calloc_fail,
                                          tcti_sgx_mgr_init_setup,
                                          tcti_sgx_mgr_init_teardown),
         cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_read_fail,

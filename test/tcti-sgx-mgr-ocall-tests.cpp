@@ -8,16 +8,24 @@
 #include <string.h>
 
 #include <setjmp.h>
+extern "C" {
 #include <cmocka.h>
+}
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
+
+extern "C" {
+gpointer
+__wrap_g_hash_table_lookup (GHashTable *hash_table,
+                            gconstpointer key);
+}
 
 gpointer
 __wrap_g_hash_table_lookup (GHashTable *hash_table,
                             gconstpointer key)
 {
-    return mock_type (gpointer);
+    return mock_type (TctiSgxSession*);
 }
 
 static TSS2_RC
@@ -55,7 +63,7 @@ test_tcti_cb (void *user_data)
 {
     TSS2_TCTI_CONTEXT_COMMON_V2 *ctx;
 
-    ctx = calloc (1, sizeof (TSS2_TCTI_CONTEXT_COMMON_V2));
+    ctx = (TSS2_TCTI_CONTEXT_COMMON_V2*)calloc (1, sizeof (TSS2_TCTI_CONTEXT_COMMON_V2));
     ctx->v1.version = 2;
     ctx->v1.transmit = mock_transmit;
     ctx->v1.receive = mock_receive;
@@ -92,18 +100,13 @@ static void
 tcti_sgx_mgr_transmit_ocall (void **state)
 {
     TSS2_RC rc;
-    tcti_sgx_session_t *session;
+    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
     uint8_t buf [12] = { 0 };
 
-    session = calloc (1, sizeof (tcti_sgx_session_t));
-    session->id = TRANSMIT_ID;
-    session->tcti_context = test_tcti_cb (NULL);
-    g_mutex_init (&session->mutex);
-    will_return (__wrap_g_hash_table_lookup, session);
+    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_transmit, TSS2_RC_SUCCESS);
     rc = tcti_sgx_transmit_ocall (TRANSMIT_ID, sizeof (buf), buf);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
-    free (session);
 }
 
 static void
@@ -129,18 +132,13 @@ static void
 tcti_sgx_mgr_receive_ocall (void **state)
 {
     TSS2_RC rc;
-    tcti_sgx_session_t *session;
+    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));;
     uint8_t buf [10] = { 0 };
 
-    session = calloc (1, sizeof (tcti_sgx_session_t));
-    session->id = TRANSMIT_ID;
-    session->tcti_context = test_tcti_cb (NULL);
-    g_mutex_init (&session->mutex);
-    will_return (__wrap_g_hash_table_lookup, session);
+    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_receive, TSS2_RC_SUCCESS);
     rc = tcti_sgx_receive_ocall (TRANSMIT_ID, sizeof (buf), buf, TSS2_TCTI_TIMEOUT_BLOCK);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
-    free (session);
 }
 
 static void
@@ -153,16 +151,12 @@ tcti_sgx_mgr_finalize_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_finalize_ocall (void **state)
 {
-    tcti_sgx_session_t *session;
+    TctiSgxSession *session;
     uint8_t buf [10] = { 0 };
 
-    session = calloc (1, sizeof (tcti_sgx_session_t));
-    session->id = TRANSMIT_ID;
-    session->tcti_context = test_tcti_cb (NULL);
-    g_mutex_init (&session->mutex);
+    session = new TctiSgxSession (TRANSMIT_ID, test_tcti_cb (NULL));
     will_return (__wrap_g_hash_table_lookup, session);
     tcti_sgx_finalize_ocall (TRANSMIT_ID);
-    free (session);
 }
 
 static void
@@ -179,16 +173,11 @@ static void
 tcti_sgx_mgr_cancel_ocall (void **state)
 {
     TSS2_RC rc;
-    tcti_sgx_session_t *session;
+    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
 
-    session = calloc (1, sizeof (tcti_sgx_session_t));
-    session->id = TRANSMIT_ID;
-    session->tcti_context = test_tcti_cb (NULL);
-    g_mutex_init (&session->mutex);
-    will_return (__wrap_g_hash_table_lookup, session);
+    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_cancel, TSS2_RC_SUCCESS);
     rc = tcti_sgx_cancel_ocall (TRANSMIT_ID);
-    free (session);
 }
 
 static void
@@ -216,13 +205,9 @@ static void
 tcti_sgx_mgr_set_locality_ocall (void **state)
 {
     TSS2_RC rc;
-    tcti_sgx_session_t *session;
+    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
 
-    session = calloc (1, sizeof (tcti_sgx_session_t));
-    session->id = TRANSMIT_ID;
-    session->tcti_context = test_tcti_cb (NULL);
-    g_mutex_init (&session->mutex);
-    will_return (__wrap_g_hash_table_lookup, session);
+    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_set_locality, TSS2_RC_SUCCESS);
     rc = tcti_sgx_set_locality_ocall (TRANSMIT_ID, 2);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
