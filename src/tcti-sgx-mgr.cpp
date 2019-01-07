@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include <tss2/tss2_tcti.h>
+#include <tss2/tss2-tcti-tabrmd.h>
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
@@ -28,6 +29,31 @@ using namespace std;
  * the outside world (where the TPM lives) via these 'ocalls'. Code in this
  * module reacts and responds to these ocalls.
  */
+TSS2_TCTI_CONTEXT*
+tabrmd_tcti_init (void *user_data)
+{
+    const char* conf_str = (const char*)user_data;
+    TSS2_TCTI_CONTEXT* ctx = NULL;
+    TSS2_RC rc = TSS2_RC_SUCCESS;
+    size_t size = 0;
+
+    rc = Tss2_Tcti_Tabrmd_Init (NULL, &size, NULL);
+    if (rc != TSS2_RC_SUCCESS) {
+        printf ("%s: first call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
+                PRIx32 "\n", __func__, rc);
+        return NULL;
+    }
+    ctx = (TSS2_TCTI_CONTEXT*)calloc (1, size);
+    rc = Tss2_Tcti_Tabrmd_Init (ctx, &size, conf_str);
+    if (rc != TSS2_RC_SUCCESS) {
+        printf ("%s: second call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
+                PRIx32 "\n", __func__, rc);
+        free (ctx);
+        return NULL;
+    }
+    return ctx;
+}
+
 /*
  * Global mgr variable with file scope.
  * We use this like a singleton since we have to respond to
@@ -106,8 +132,7 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
         return 0;
     }
     if (callback == NULL) {
-        cout << "callback parameter is required" <<  endl;
-        return 1;
+        callback = tabrmd_tcti_init;
     }
     mgr_global = (tcti_sgx_mgr_t*)calloc (1, sizeof (tcti_sgx_mgr_t));
     if (mgr_global == NULL) {

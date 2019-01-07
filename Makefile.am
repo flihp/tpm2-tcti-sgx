@@ -78,15 +78,14 @@ src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
 src_libtcti_sgx_mgr_a_LDLIBS  = $(GLIB_LIBS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.cpp
 
-src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
-src_libtcti_sgx_mgr_la_LIBADD = $(GLIB_LIBS)
+src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS)
+src_libtcti_sgx_mgr_la_LIBADD = $(GLIB_LIBS) $(TABRMD_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-sgx-mgr.cpp
 
 # example application & enclave
-example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS) \
-    $(SGX_URTS_CFLAGS) -I$(builddir)/example
-example_application_LDADD = src/libtcti-sgx-mgr.la $(TABRMD_LIBS) \
-    $(SGX_URTS_LIBS)
+example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(SGX_URTS_CFLAGS) \
+    -I$(builddir)/example
+example_application_LDADD = src/libtcti-sgx-mgr.la $(SGX_URTS_LIBS)
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/application.$(OBJEXT): example/enclave_u.c
