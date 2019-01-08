@@ -6,29 +6,10 @@
 #define TCTI_SGX_MGR_PRIV_H
 
 #include <glib.h>
+#include <list>
 
 #include <tss2/tss2_tcti.h>
 #include "tcti-sgx-mgr.h"
-
-class TctiSgxMgr {
-private:
-    TctiSgxMgr (downstream_tcti_init_cb init_cb,
-                gpointer user_data);
-    TctiSgxMgr (TctiSgxMgr const&);
-    void operator=(TctiSgxMgr const&);
-public:
-    downstream_tcti_init_cb  init_cb;
-    gpointer user_data;
-    GHashTable *session_table;
-    GMutex session_table_mutex;
-    static TctiSgxMgr& get_instance (downstream_tcti_init_cb init_cb,
-                                     gpointer user_data)
-    {
-        static TctiSgxMgr instance (init_cb, user_data);
-        return instance;
-    }
-    ~TctiSgxMgr ();
-};
 
 class TctiSgxSession {
     TSS2_TCTI_CONTEXT *tcti_context;
@@ -44,6 +25,32 @@ public:
     TSS2_RC receive (size_t *size, uint8_t *response, int32_t timeout);
     TSS2_RC cancel ();
     TSS2_RC set_locality (uint8_t locality);
+};
+
+class TctiSgxMgr {
+private:
+    TctiSgxMgr (downstream_tcti_init_cb init_cb,
+                gpointer user_data);
+    TctiSgxMgr (TctiSgxMgr const&);
+    void operator=(TctiSgxMgr const&);
+public:
+    downstream_tcti_init_cb  init_cb;
+    gpointer user_data;
+    std::list <TctiSgxSession*> sessions;
+    GMutex session_table_mutex;
+    static TctiSgxMgr& get_instance (downstream_tcti_init_cb init_cb,
+                                     gpointer user_data)
+    {
+        static TctiSgxMgr instance (init_cb, user_data);
+        return instance;
+    }
+    static TctiSgxMgr& get_instance (void)
+    {
+        return TctiSgxMgr::get_instance (NULL, NULL);
+    }
+    ~TctiSgxMgr ();
+    TctiSgxSession* session_lookup (uint64_t id);
+    void session_remove (uint64_t id);
 };
 
 #if defined (__cplusplus)

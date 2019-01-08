@@ -15,19 +15,6 @@ extern "C" {
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
 
-extern "C" {
-gpointer
-__wrap_g_hash_table_lookup (GHashTable *hash_table,
-                            gconstpointer key);
-}
-
-gpointer
-__wrap_g_hash_table_lookup (GHashTable *hash_table,
-                            gconstpointer key)
-{
-    return mock_type (TctiSgxSession*);
-}
-
 static TSS2_RC
 mock_transmit (TSS2_TCTI_CONTEXT *ctx,
                size_t size,
@@ -72,20 +59,35 @@ test_tcti_cb (void *user_data)
     return  (TSS2_TCTI_CONTEXT*)ctx;
 }
 
+#define GOOD_ID 0xf913038a09efdab5
+#define BAD_ID  0x5badfe90a830319f
 static int
-tcti_transmit_setup( void **state)
+tcti_sgx_mgr_ocalls_setup (void **state)
 {
-    return tcti_sgx_mgr_init (test_tcti_cb, NULL);
+    int ret = tcti_sgx_mgr_init (test_tcti_cb, NULL);
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance ();
+    TctiSgxSession *session = new TctiSgxSession (GOOD_ID, test_tcti_cb (NULL));
+
+    mgr.sessions.push_back (session);
+    return 0;
 }
 
-#define TRANSMIT_ID 0xf913038a09efdab5
+#include <inttypes.h>
+static int
+tcti_sgx_mgr_ocalls_teardown (void **state)
+{
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance ();
+
+    mgr.session_remove (GOOD_ID);
+    return 0;
+}
+
 static void
 tcti_sgx_mgr_transmit_ocall_bad_id (void **state)
 {
     TSS2_RC rc;
 
-    will_return (__wrap_g_hash_table_lookup, NULL);
-    rc = tcti_sgx_transmit_ocall (TRANSMIT_ID, 0, NULL);
+    rc = tcti_sgx_transmit_ocall (BAD_ID, 0, NULL);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_VALUE);
 }
 
@@ -93,12 +95,10 @@ static void
 tcti_sgx_mgr_transmit_ocall (void **state)
 {
     TSS2_RC rc;
-    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
     uint8_t buf [12] = { 0 };
 
-    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_transmit, TSS2_RC_SUCCESS);
-    rc = tcti_sgx_transmit_ocall (TRANSMIT_ID, sizeof (buf), buf);
+    rc = tcti_sgx_transmit_ocall (GOOD_ID, sizeof (buf), buf);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
 }
 
@@ -107,7 +107,7 @@ tcti_sgx_mgr_receive_ocall_bad_timeout (void **state)
 {
     TSS2_RC rc;
 
-    rc = tcti_sgx_receive_ocall (TRANSMIT_ID, 0, NULL, 1);
+    rc = tcti_sgx_receive_ocall (GOOD_ID, 0, NULL, 1);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_VALUE);
 }
 
@@ -116,8 +116,7 @@ tcti_sgx_mgr_receive_ocall_bad_id (void **state)
 {
     TSS2_RC rc;
 
-    will_return (__wrap_g_hash_table_lookup, NULL);
-    rc = tcti_sgx_receive_ocall (TRANSMIT_ID, 0, NULL, TSS2_TCTI_TIMEOUT_BLOCK);
+    rc = tcti_sgx_receive_ocall (BAD_ID, 0, NULL, TSS2_TCTI_TIMEOUT_BLOCK);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_VALUE);
 }
 
@@ -125,20 +124,17 @@ static void
 tcti_sgx_mgr_receive_ocall (void **state)
 {
     TSS2_RC rc;
-    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));;
     uint8_t buf [10] = { 0 };
 
-    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_receive, TSS2_RC_SUCCESS);
-    rc = tcti_sgx_receive_ocall (TRANSMIT_ID, sizeof (buf), buf, TSS2_TCTI_TIMEOUT_BLOCK);
+    rc = tcti_sgx_receive_ocall (GOOD_ID, sizeof (buf), buf, TSS2_TCTI_TIMEOUT_BLOCK);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
 }
 
 static void
 tcti_sgx_mgr_finalize_ocall_bad_id (void **state)
 {
-    will_return (__wrap_g_hash_table_lookup, NULL);
-    tcti_sgx_finalize_ocall (TRANSMIT_ID);
+    tcti_sgx_finalize_ocall (BAD_ID);
 }
 
 static void
@@ -147,9 +143,7 @@ tcti_sgx_mgr_finalize_ocall (void **state)
     TctiSgxSession *session;
     uint8_t buf [10] = { 0 };
 
-    session = new TctiSgxSession (TRANSMIT_ID, test_tcti_cb (NULL));
-    will_return (__wrap_g_hash_table_lookup, session);
-    tcti_sgx_finalize_ocall (TRANSMIT_ID);
+    tcti_sgx_finalize_ocall (GOOD_ID);
 }
 
 static void
@@ -157,8 +151,7 @@ tcti_sgx_mgr_cancel_ocall_bad_id (void **state)
 {
     TSS2_RC rc;
 
-    will_return (__wrap_g_hash_table_lookup, NULL);
-    rc = tcti_sgx_cancel_ocall (TRANSMIT_ID);
+    rc = tcti_sgx_cancel_ocall (BAD_ID);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_VALUE);
 }
 
@@ -166,11 +159,10 @@ static void
 tcti_sgx_mgr_cancel_ocall (void **state)
 {
     TSS2_RC rc;
-    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
 
-    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_cancel, TSS2_RC_SUCCESS);
-    rc = tcti_sgx_cancel_ocall (TRANSMIT_ID);
+    rc = tcti_sgx_cancel_ocall (GOOD_ID);
+    assert_int_equal (rc, TSS2_RC_SUCCESS);
 }
 
 static void
@@ -178,9 +170,9 @@ tcti_sgx_mgr_get_poll_handles_ocall (void **state)
 {
     TSS2_RC rc;
     TSS2_TCTI_POLL_HANDLE handles [2];
-    size_t num_handles = sizeof (handles);
+    size_t num_handles = 2;
 
-    rc = tcti_sgx_get_poll_handles_ocall (TRANSMIT_ID, handles, &num_handles);
+    rc = tcti_sgx_get_poll_handles_ocall (GOOD_ID, handles, &num_handles);
     assert_int_equal (rc, TSS2_TCTI_RC_NOT_IMPLEMENTED);
 }
 
@@ -189,8 +181,7 @@ tcti_sgx_mgr_set_locality_ocall_bad_id (void **state)
 {
     TSS2_RC rc;
 
-    will_return (__wrap_g_hash_table_lookup, NULL);
-    rc = tcti_sgx_set_locality_ocall (TRANSMIT_ID, 2);
+    rc = tcti_sgx_set_locality_ocall (BAD_ID, 2);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_VALUE);
 }
 
@@ -198,11 +189,9 @@ static void
 tcti_sgx_mgr_set_locality_ocall (void **state)
 {
     TSS2_RC rc;
-    TctiSgxSession session (TRANSMIT_ID, test_tcti_cb (NULL));
 
-    will_return (__wrap_g_hash_table_lookup, &session);
     will_return (mock_set_locality, TSS2_RC_SUCCESS);
-    rc = tcti_sgx_set_locality_ocall (TRANSMIT_ID, 2);
+    rc = tcti_sgx_set_locality_ocall (GOOD_ID, 2);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
 }
 
@@ -210,30 +199,42 @@ int
 main (void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test_setup (tcti_sgx_mgr_transmit_ocall_bad_id,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_transmit_ocall,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall_bad_timeout,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall_bad_id,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_finalize_ocall_bad_id,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_finalize_ocall,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_cancel_ocall_bad_id,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_cancel_ocall,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_get_poll_handles_ocall,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_set_locality_ocall_bad_id,
-                                tcti_transmit_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_set_locality_ocall,
-                                tcti_transmit_setup),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_transmit_ocall_bad_id,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_transmit_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall_bad_timeout,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall_bad_id,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_finalize_ocall_bad_id,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_finalize_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_cancel_ocall_bad_id,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_cancel_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_get_poll_handles_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_set_locality_ocall_bad_id,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
+        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_set_locality_ocall,
+                                         tcti_sgx_mgr_ocalls_setup,
+                                         tcti_sgx_mgr_ocalls_teardown),
     };
 
     return cmocka_run_group_tests (tests, NULL, NULL);

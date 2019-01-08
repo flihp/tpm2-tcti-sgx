@@ -20,6 +20,7 @@
 #include "tcti-util.h"
 
 #include <iostream>
+#include <list>
 
 using namespace std;
 
@@ -49,13 +50,38 @@ using namespace std;
  */
 TctiSgxMgr::TctiSgxMgr (downstream_tcti_init_cb init_cb,
                         gpointer user_data)
-: init_cb (init_cb), user_data (user_data)
+: init_cb (init_cb), user_data (user_data) {}
+TctiSgxMgr::~TctiSgxMgr () {}
+
+TctiSgxSession*
+TctiSgxMgr::session_lookup (uint64_t id)
 {
-    session_table = g_hash_table_new (g_int64_hash, g_int64_equal);
+    list <TctiSgxSession*>::const_iterator itr;
+
+    cout << __func__ << ": looking up TctiSgxSession with id: " << id << endl;
+    for (itr = this->sessions.begin (); itr != this->sessions.end (); ++itr)
+    {
+        if ((*itr)->id == id) {
+            return *itr;
+        }
+    }
+    return NULL;
 }
-TctiSgxMgr::~TctiSgxMgr ()
+
+void
+TctiSgxMgr::session_remove (uint64_t id)
 {
-    g_hash_table_unref (session_table);
+    list <TctiSgxSession*>::const_iterator itr;
+
+    for (itr = this->sessions.begin (); itr != this->sessions.end (); ++itr)
+    {
+        if ((*itr)->id == id) {
+            delete *itr;
+            this->sessions.erase (itr);
+            return;
+        }
+    }
+    return;
 }
 
 TctiSgxSession::TctiSgxSession (uint64_t id,
@@ -130,7 +156,6 @@ tcti_sgx_init_ocall ()
     TctiSgxSession *session;
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (tabrmd_tcti_init, NULL);
     gint fd;
-    gboolean insert_result;
     uint64_t id;
     TSS2_TCTI_CONTEXT *tcti_context;
 
@@ -153,15 +178,7 @@ tcti_sgx_init_ocall ()
     }
     session = new TctiSgxSession (id, tcti_context);
     g_mutex_lock (&mgr.session_table_mutex);
-    insert_result = g_hash_table_insert (mgr.session_table,
-                                         &session->id,
-                                         session);
-    if (insert_result != TRUE) {
-        cout << __func__ << ": failed to insert session into session table" << endl;
-        g_mutex_unlock (&mgr.session_table_mutex);
-        free (session);
-        return 0;
-    }
+    mgr.sessions.push_front (session);
     g_mutex_unlock (&mgr.session_table_mutex);
     return session->id;
 }
@@ -176,7 +193,7 @@ tcti_sgx_transmit_ocall (uint64_t id,
     TSS2_RC ret;
 
     g_mutex_lock (&mgr.session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    session = mgr.session_lookup (id);
     g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -201,7 +218,7 @@ tcti_sgx_receive_ocall (uint64_t id,
         return TSS2_TCTI_RC_BAD_VALUE;
 
     g_mutex_lock (&mgr.session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    session = mgr.session_lookup (id);
     g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -219,11 +236,8 @@ tcti_sgx_finalize_ocall (uint64_t id)
     TctiSgxSession *session;
 
     g_mutex_lock (&mgr.session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    mgr.session_remove (id);
     g_mutex_unlock (&mgr.session_table_mutex);
-    if (session == NULL)
-        return;
-    delete session;
 }
 
 TSS2_RC
@@ -234,7 +248,7 @@ tcti_sgx_cancel_ocall (uint64_t id)
     TSS2_RC ret;
 
     g_mutex_lock (&mgr.session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    session = mgr.session_lookup (id);
     g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
@@ -261,7 +275,7 @@ tcti_sgx_set_locality_ocall (uint64_t id,
     TSS2_RC ret;
 
     g_mutex_lock (&mgr.session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    session = mgr.session_lookup (id);
     g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;

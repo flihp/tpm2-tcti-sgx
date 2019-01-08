@@ -47,10 +47,6 @@ ssize_t
 __wrap_read (int fd,
              void *buf,
              size_t count);
-gboolean
-__wrap_g_hash_table_insert (GHashTable *hash_table,
-                            gpointer key,
-                            gpointer value);
 }
 
 void*
@@ -163,29 +159,6 @@ tcti_sgx_mgr_init_ocall_cb_fail (void **state)
     assert_int_equal (id, 0);
 }
 
-gboolean
-__wrap_g_hash_table_insert (GHashTable *hash_table,
-                            gpointer key,
-                            gpointer value)
-{
-    printf ("%s:\n", __func__);
-    return mock_type (gboolean);
-}
-
-static void
-tcti_sgx_mgr_init_ocall_insert_fail (void **state)
-{
-    will_return (__wrap_open, 0);
-    will_return (__wrap_open, TEST_FD);
-    will_return (__wrap_read, 0);
-    will_return (__wrap_read, TEST_ID);
-    will_return (__wrap_read, sizeof (uint64_t));
-    will_return (callback_ctx, TEST_CTX);
-    will_return (__wrap_g_hash_table_insert, false);
-    uint64_t id = tcti_sgx_init_ocall ();
-    assert_int_equal (id, 0);
-}
-
 static void
 tcti_sgx_mgr_init_ocall_success (void **state)
 {
@@ -195,7 +168,6 @@ tcti_sgx_mgr_init_ocall_success (void **state)
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
     will_return (callback_ctx, TEST_CTX);
-    will_return (__wrap_g_hash_table_insert, true);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, TEST_ID);
 }
@@ -209,8 +181,6 @@ main (void)
         cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_read_fail,
                                 tcti_sgx_mgr_init_setup),
         cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_cb_fail,
-                                tcti_sgx_mgr_init_setup),
-        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_insert_fail,
                                 tcti_sgx_mgr_init_setup),
         cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_success,
                                 tcti_sgx_mgr_init_setup),
