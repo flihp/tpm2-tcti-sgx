@@ -15,6 +15,7 @@
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
+#include "tcti-util.h"
 
 #include <iostream>
 
@@ -29,31 +30,6 @@ using namespace std;
  * the outside world (where the TPM lives) via these 'ocalls'. Code in this
  * module reacts and responds to these ocalls.
  */
-TSS2_TCTI_CONTEXT*
-tabrmd_tcti_init (void *user_data)
-{
-    const char* conf_str = (const char*)user_data;
-    TSS2_TCTI_CONTEXT* ctx = NULL;
-    TSS2_RC rc = TSS2_RC_SUCCESS;
-    size_t size = 0;
-
-    rc = Tss2_Tcti_Tabrmd_Init (NULL, &size, NULL);
-    if (rc != TSS2_RC_SUCCESS) {
-        printf ("%s: first call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
-                PRIx32 "\n", __func__, rc);
-        return NULL;
-    }
-    ctx = (TSS2_TCTI_CONTEXT*)calloc (1, size);
-    rc = Tss2_Tcti_Tabrmd_Init (ctx, &size, conf_str);
-    if (rc != TSS2_RC_SUCCESS) {
-        printf ("%s: second call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
-                PRIx32 "\n", __func__, rc);
-        free (ctx);
-        return NULL;
-    }
-    return ctx;
-}
-
 /*
  * Global mgr variable with file scope.
  * We use this like a singleton since we have to respond to

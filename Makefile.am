@@ -33,7 +33,8 @@ check_PROGRAMS  = \
     test/tcti-sgx-mgr-init-tests \
     test/tcti-sgx-mgr-ocall-tests \
     test/tcti-sgx-struct-tests \
-    test/tcti-sgx-call-tests
+    test/tcti-sgx-call-tests \
+    test/tcti-util
 endif
 TESTS = $(check_PROGRAMS)
 
@@ -76,11 +77,11 @@ src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 # application library
 src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS)
 src_libtcti_sgx_mgr_a_LDLIBS  = $(GLIB_LIBS)
-src_libtcti_sgx_mgr_a_SOURCES = src/tcti-sgx-mgr.cpp
+src_libtcti_sgx_mgr_a_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
 src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_CFLAGS)
-src_libtcti_sgx_mgr_la_LIBADD = $(GLIB_LIBS) $(TABRMD_LIBS)
-src_libtcti_sgx_mgr_la_SOURCES = src/tcti-sgx-mgr.cpp
+src_libtcti_sgx_mgr_la_LIBADD = $(GLIB_LIBS) $(TABRMD_LIBS) $(TABRMD_LIBS)
+src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
 # example application & enclave
 example_application_CFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(SGX_URTS_CFLAGS) \
@@ -113,12 +114,12 @@ test_libtest_a_SOURCES = test/tcti-sgx_null-wraps.c test/tcti-sgx-common.c
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_init_param_tests_LDADD = src/libtss2-tcti-sgx.a \
-    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
+    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_init_param_tests_SOURCES = test/tcti-sgx-init-param-tests.c
 
 test_tcti_sgx_mgr_init_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
+    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_LIBS)
 test_tcti_sgx_mgr_init_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) -lstdc++
 test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
@@ -126,7 +127,7 @@ test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
 test_tcti_sgx_mgr_init_tests_SOURCES = test/tcti-sgx-mgr-init-tests.cpp
 
 test_tcti_sgx_mgr_ocall_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
+    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS) $(TABRMD_LIBS)
 test_tcti_sgx_mgr_ocall_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) -lstdc++
 test_tcti_sgx_mgr_ocall_tests_LDFLAGS = -Wl,--wrap=g_hash_table_lookup
@@ -145,6 +146,13 @@ test_tcti_sgx_call_tests_LDADD = src/libtss2-tcti-sgx.a test/libtest.a \
     $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS)
 test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_call_tests_SOURCES = test/tcti-sgx-call-tests.c
+
+test_tcti_util_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
+    $(CODE_COVERAGE_CFLAGS) $(GLIB_CFLAGS)
+test_tcti_util_LDADD = src/libtcti-sgx-mgr.a \
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(GLIB_LIBS) $(TABRMD_LIBS)
+test_tcti_util_LDFLAGS = -Wl,--wrap=Tss2_Tcti_Tabrmd_Init,--wrap=calloc,--wrap=free
+test_tcti_util_SOURCES = test/tcti-util.c
 
 AUTHORS :
 	git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort | \

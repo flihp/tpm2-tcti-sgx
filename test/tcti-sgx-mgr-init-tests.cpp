@@ -137,8 +137,11 @@ tcti_sgx_mgr_init_teardown (void **state)
 static void
 tcti_sgx_mgr_init_null_callback (void **state)
 {
-    int ret = tcti_sgx_mgr_init (NULL, NULL);
-    assert_int_equal (ret, 1);
+    int ret;
+
+    will_return (__wrap_calloc, passthrough);
+    ret = tcti_sgx_mgr_init (NULL, NULL);
+    assert_int_equal (ret, 0);
 }
 
 static void
