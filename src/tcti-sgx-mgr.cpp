@@ -17,6 +17,8 @@
 #include "tcti-sgx-mgr.h"
 #include "tcti-util.h"
 
+#include "tcti-util.h"
+
 #include <iostream>
 
 using namespace std;
@@ -45,7 +47,16 @@ using namespace std;
  * connections from within the enclave. When interacting with this variable
  * the caller MUST hold the 'session_table_mutex'.
  */
-static tcti_sgx_mgr_t *mgr_global = NULL;
+TctiSgxMgr::TctiSgxMgr (downstream_tcti_init_cb init_cb,
+                        gpointer user_data)
+: init_cb (init_cb), user_data (user_data)
+{
+    session_table = g_hash_table_new (g_int64_hash, g_int64_equal);
+}
+TctiSgxMgr::~TctiSgxMgr ()
+{
+    g_hash_table_unref (session_table);
+}
 
 TctiSgxSession::TctiSgxSession (uint64_t id,
                                 TSS2_TCTI_CONTEXT *tcti_context)
@@ -103,33 +114,11 @@ int
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    gpointer user_data)
 {
-    if (mgr_global != NULL) {
-        cout << "already initialized" << endl;
-        return 0;
-    }
     if (callback == NULL) {
         callback = tabrmd_tcti_init;
     }
-    mgr_global = (tcti_sgx_mgr_t*)calloc (1, sizeof (tcti_sgx_mgr_t));
-    if (mgr_global == NULL) {
-        perror ("calloc");
-        return 1;
-    }
-    mgr_global->init_cb = callback;
-    mgr_global->user_data = user_data;
-    g_mutex_init (&mgr_global->session_table_mutex);
-    mgr_global->session_table = g_hash_table_new (g_int64_hash, g_int64_equal);
+    TctiSgxMgr::get_instance (callback, user_data);
     return 0;
-}
-
-void
-tcti_sgx_mgr_finalize (void)
-{
-    if (mgr_global != NULL) {
-        g_hash_table_unref (mgr_global->session_table);
-        free (mgr_global);
-        mgr_global = NULL;
-    }
 }
 
 /*
@@ -139,15 +128,12 @@ uint64_t
 tcti_sgx_init_ocall ()
 {
     TctiSgxSession *session;
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (tabrmd_tcti_init, NULL);
     gint fd;
     gboolean insert_result;
     uint64_t id;
     TSS2_TCTI_CONTEXT *tcti_context;
 
-    if (mgr_global == NULL) {
-        cout << __func__ << ": tcti_sgx_mgr not initialized" << endl;
-        return 0;
-    }
     fd = open (RAND_SRC, O_RDONLY);
     if (fd == -1) {
         cout << __func__ << ": failed to open " << RAND_SRC << ": "
@@ -160,23 +146,23 @@ tcti_sgx_init_ocall ()
             << " bytes from " << RAND_SRC << ": " << strerror (errno) << endl;
         return 0;
     }
-    tcti_context = mgr_global->init_cb (mgr_global->user_data);
+    tcti_context = mgr.init_cb (mgr.user_data);
     if (tcti_context == NULL) {
         cout << __func__ << ": tcti init callback failed to create a TCTI" << endl;
         return 0;
     }
     session = new TctiSgxSession (id, tcti_context);
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    insert_result = g_hash_table_insert (mgr_global->session_table,
+    g_mutex_lock (&mgr.session_table_mutex);
+    insert_result = g_hash_table_insert (mgr.session_table,
                                          &session->id,
                                          session);
     if (insert_result != TRUE) {
         cout << __func__ << ": failed to insert session into session table" << endl;
-        g_mutex_unlock (&mgr_global->session_table_mutex);
+        g_mutex_unlock (&mgr.session_table_mutex);
         free (session);
         return 0;
     }
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_unlock (&mgr.session_table_mutex);
     return session->id;
 }
 
@@ -185,12 +171,13 @@ tcti_sgx_transmit_ocall (uint64_t id,
                          size_t size,
                          const uint8_t *command)
 {
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr.session_table_mutex);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -205,6 +192,7 @@ tcti_sgx_receive_ocall (uint64_t id,
                         uint8_t *response,
                         uint32_t timeout)
 {
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
     TSS2_RC ret;
 
@@ -212,9 +200,9 @@ tcti_sgx_receive_ocall (uint64_t id,
     if (timeout != TSS2_TCTI_TIMEOUT_BLOCK)
         return TSS2_TCTI_RC_BAD_VALUE;
 
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr.session_table_mutex);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -227,11 +215,12 @@ tcti_sgx_receive_ocall (uint64_t id,
 void
 tcti_sgx_finalize_ocall (uint64_t id)
 {
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
 
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr.session_table_mutex);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return;
     delete session;
@@ -240,12 +229,13 @@ tcti_sgx_finalize_ocall (uint64_t id)
 TSS2_RC
 tcti_sgx_cancel_ocall (uint64_t id)
 {
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr.session_table_mutex);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -266,12 +256,13 @@ TSS2_RC
 tcti_sgx_set_locality_ocall (uint64_t id,
                              uint8_t locality)
 {
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr_global->session_table_mutex);
-    session = (TctiSgxSession*)g_hash_table_lookup (mgr_global->session_table, &id);
-    g_mutex_unlock (&mgr_global->session_table_mutex);
+    g_mutex_lock (&mgr.session_table_mutex);
+    session = (TctiSgxSession*)g_hash_table_lookup (mgr.session_table, &id);
+    g_mutex_unlock (&mgr.session_table_mutex);
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();

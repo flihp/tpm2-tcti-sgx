@@ -18,7 +18,6 @@ typedef TSS2_TCTI_CONTEXT* (*downstream_tcti_init_cb) (void *user_data);
 
 int tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                        void *user_data);
-void tcti_sgx_mgr_finalize (void);
 
 #if defined (__cplusplus)
 }

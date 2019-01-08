@@ -29,6 +29,10 @@ __real_calloc (size_t nmemb,
 void*
 __wrap_calloc (size_t nmemb,
                size_t size);
+void
+__real_free (void* mem);
+void
+__wrap_free (void* mem);
 int
 __real_open (const char *pathname,
              int flags);
@@ -63,6 +67,17 @@ __wrap_calloc (size_t nmemb,
         return __real_calloc (nmemb, size);
     default:
         assert_true (false);
+    }
+}
+
+#define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
+void
+__wrap_free (void* mem) {
+    if (mem == TEST_CTX) {
+        printf ("%s: mem %p\n", __func__, mem);
+        return;
+    } else {
+        __real_free (mem);
     }
 }
 
@@ -101,81 +116,16 @@ __wrap_read (int fd,
 }
 
 TSS2_TCTI_CONTEXT*
-callback (void *user_data)
-{
-    return NULL;
-}
-
-static int
-tcti_sgx_mgr_init_setup (void **state)
-{
-    will_return (__wrap_calloc, passthrough);
-    return tcti_sgx_mgr_init (callback, NULL);
-}
-
-#define TEST_CTX (TSS2_TCTI_CONTEXT*)0x666
-TSS2_TCTI_CONTEXT*
 callback_ctx (void *user_data)
 {
-    return TEST_CTX;
+    printf ("%s: floop\n", __func__);
+    return mock_type (TSS2_TCTI_CONTEXT*);
 }
 
 static int
-tcti_sgx_mgr_init_setup_ctx (void **state)
+tcti_sgx_mgr_init_setup(void **state)
 {
-    will_return (__wrap_calloc, passthrough);
     return tcti_sgx_mgr_init (callback_ctx, NULL);
-}
-
-static int
-tcti_sgx_mgr_init_teardown (void **state)
-{
-    tcti_sgx_mgr_finalize ();
-    return 0;
-}
-
-static void
-tcti_sgx_mgr_init_null_callback (void **state)
-{
-    int ret;
-
-    will_return (__wrap_calloc, passthrough);
-    ret = tcti_sgx_mgr_init (NULL, NULL);
-    assert_int_equal (ret, 0);
-}
-
-static void
-tcti_sgx_mgr_init_calloc_fail (void **state)
-{
-    int ret;
-
-    will_return (__wrap_calloc, null);
-    ret = tcti_sgx_mgr_init (callback, NULL);
-    assert_int_equal (ret, 1);
-}
-
-static void
-tcti_sgx_mgr_init_null_data (void **state)
-{
-    int ret;
-
-    will_return (__wrap_calloc, passthrough);
-    ret = tcti_sgx_mgr_init (callback, NULL);
-    assert_int_equal (ret, 0);
-}
-
-static void
-tcti_sgx_mgr_init_twice (void **state)
-{
-    int ret = tcti_sgx_mgr_init (callback, NULL);
-    assert_int_equal (ret, 0);
-}
-
-static void
-tcti_sgx_mgr_init_ocall_no_init (void **state)
-{
-    uint64_t id = tcti_sgx_init_ocall ();
-    assert_int_equal (id, 0);
 }
 
 static void
@@ -208,6 +158,7 @@ tcti_sgx_mgr_init_ocall_cb_fail (void **state)
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
+    will_return (callback_ctx, NULL);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, 0);
 }
@@ -229,6 +180,7 @@ tcti_sgx_mgr_init_ocall_insert_fail (void **state)
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
+    will_return (callback_ctx, TEST_CTX);
     will_return (__wrap_g_hash_table_insert, false);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, 0);
@@ -242,6 +194,7 @@ tcti_sgx_mgr_init_ocall_success (void **state)
     will_return (__wrap_read, 0);
     will_return (__wrap_read, TEST_ID);
     will_return (__wrap_read, sizeof (uint64_t));
+    will_return (callback_ctx, TEST_CTX);
     will_return (__wrap_g_hash_table_insert, true);
     uint64_t id = tcti_sgx_init_ocall ();
     assert_int_equal (id, TEST_ID);
@@ -251,31 +204,16 @@ int
 main (void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_callback,
-                                   tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_teardown (tcti_sgx_mgr_init_calloc_fail,
-                                   tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_teardown (tcti_sgx_mgr_init_null_data,
-                                   tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_twice,
-                                         tcti_sgx_mgr_init_setup,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test (tcti_sgx_mgr_init_ocall_no_init),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_open_fail,
-                                         tcti_sgx_mgr_init_setup,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_read_fail,
-                                         tcti_sgx_mgr_init_setup,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_cb_fail,
-                                         tcti_sgx_mgr_init_setup,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_insert_fail,
-                                         tcti_sgx_mgr_init_setup_ctx,
-                                         tcti_sgx_mgr_init_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_init_ocall_success,
-                                         tcti_sgx_mgr_init_setup_ctx,
-                                         tcti_sgx_mgr_init_teardown),
+        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_open_fail,
+                                tcti_sgx_mgr_init_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_read_fail,
+                                tcti_sgx_mgr_init_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_cb_fail,
+                                tcti_sgx_mgr_init_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_insert_fail,
+                                tcti_sgx_mgr_init_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_init_ocall_success,
+                                tcti_sgx_mgr_init_setup),
     };
 
     return cmocka_run_group_tests (tests, NULL, NULL);

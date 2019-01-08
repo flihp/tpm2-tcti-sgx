@@ -78,13 +78,6 @@ tcti_transmit_setup( void **state)
     return tcti_sgx_mgr_init (test_tcti_cb, NULL);
 }
 
-static int
-tcti_teardown (void **state)
-{
-    tcti_sgx_mgr_finalize ();
-    return 0;
-}
-
 #define TRANSMIT_ID 0xf913038a09efdab5
 static void
 tcti_sgx_mgr_transmit_ocall_bad_id (void **state)
@@ -217,42 +210,30 @@ int
 main (void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_transmit_ocall_bad_id,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_transmit_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall_bad_timeout,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall_bad_id,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_receive_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_finalize_ocall_bad_id,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_finalize_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_cancel_ocall_bad_id,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_cancel_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_get_poll_handles_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_set_locality_ocall_bad_id,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
-        cmocka_unit_test_setup_teardown (tcti_sgx_mgr_set_locality_ocall,
-                                         tcti_transmit_setup,
-                                         tcti_teardown),
+        cmocka_unit_test_setup (tcti_sgx_mgr_transmit_ocall_bad_id,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_transmit_ocall,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall_bad_timeout,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall_bad_id,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_receive_ocall,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_finalize_ocall_bad_id,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_finalize_ocall,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_cancel_ocall_bad_id,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_cancel_ocall,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_get_poll_handles_ocall,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_set_locality_ocall_bad_id,
+                                tcti_transmit_setup),
+        cmocka_unit_test_setup (tcti_sgx_mgr_set_locality_ocall,
+                                tcti_transmit_setup),
     };
 
     return cmocka_run_group_tests (tests, NULL, NULL);

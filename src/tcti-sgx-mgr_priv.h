@@ -7,14 +7,28 @@
 
 #include <glib.h>
 
+#include <tss2/tss2_tcti.h>
 #include "tcti-sgx-mgr.h"
 
-typedef struct tcti_sgx_mgr {
+class TctiSgxMgr {
+private:
+    TctiSgxMgr (downstream_tcti_init_cb init_cb,
+                gpointer user_data);
+    TctiSgxMgr (TctiSgxMgr const&);
+    void operator=(TctiSgxMgr const&);
+public:
     downstream_tcti_init_cb  init_cb;
     gpointer user_data;
     GHashTable *session_table;
     GMutex session_table_mutex;
-} tcti_sgx_mgr_t;
+    static TctiSgxMgr& get_instance (downstream_tcti_init_cb init_cb,
+                                     gpointer user_data)
+    {
+        static TctiSgxMgr instance (init_cb, user_data);
+        return instance;
+    }
+    ~TctiSgxMgr ();
+};
 
 class TctiSgxSession {
     TSS2_TCTI_CONTEXT *tcti_context;
@@ -36,6 +50,7 @@ public:
 extern "C" {
 #endif
 
+TSS2_TCTI_CONTEXT* tabrmd_tcti_init (void *user_data);
 uint64_t tcti_sgx_init_ocall ();
 TSS2_RC tcti_sgx_transmit_ocall (uint64_t id,
                                  size_t size,
