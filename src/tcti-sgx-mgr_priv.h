@@ -7,13 +7,14 @@
 
 #include <glib.h>
 #include <list>
+#include <mutex>
 
 #include <tss2/tss2_tcti.h>
 #include "tcti-sgx-mgr.h"
 
 class TctiSgxSession {
     TSS2_TCTI_CONTEXT *tcti_context;
-    GMutex mutex;
+    std::mutex mutex;
 public:
     uint64_t id;
     TctiSgxSession (uint64_t id,
@@ -37,7 +38,7 @@ public:
     downstream_tcti_init_cb  init_cb;
     gpointer user_data;
     std::list <TctiSgxSession*> sessions;
-    GMutex session_table_mutex;
+    std::mutex sessions_mutex;
     static TctiSgxMgr& get_instance (downstream_tcti_init_cb init_cb,
                                      gpointer user_data)
     {
@@ -49,6 +50,8 @@ public:
         return TctiSgxMgr::get_instance (NULL, NULL);
     }
     ~TctiSgxMgr ();
+    void lock ();
+    void unlock ();
     TctiSgxSession* session_lookup (uint64_t id);
     void session_remove (uint64_t id);
 };

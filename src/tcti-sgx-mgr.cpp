@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <list>
+#include <mutex>
 
 using namespace std;
 
@@ -46,13 +47,23 @@ using namespace std;
  * The data in this structure should be treated as 'readonly' after
  * initialization with the exception of the GHashTable we use to track
  * connections from within the enclave. When interacting with this variable
- * the caller MUST hold the 'session_table_mutex'.
+ * the caller MUST hold the 'sessions_mutex'.
  */
 TctiSgxMgr::TctiSgxMgr (downstream_tcti_init_cb init_cb,
                         gpointer user_data)
 : init_cb (init_cb), user_data (user_data) {}
 TctiSgxMgr::~TctiSgxMgr () {}
 
+void
+TctiSgxMgr::lock ()
+{
+    this->sessions_mutex.lock ();
+}
+void
+TctiSgxMgr::unlock ()
+{
+    this->sessions_mutex.unlock ();
+}
 TctiSgxSession*
 TctiSgxMgr::session_lookup (uint64_t id)
 {
@@ -86,27 +97,23 @@ TctiSgxMgr::session_remove (uint64_t id)
 
 TctiSgxSession::TctiSgxSession (uint64_t id,
                                 TSS2_TCTI_CONTEXT *tcti_context)
-: tcti_context (tcti_context), id (id)
-{
-    g_mutex_init (&mutex);
-}
+: tcti_context (tcti_context), id (id) {}
 
 TctiSgxSession::~TctiSgxSession ()
 {
     Tss2_Tcti_Finalize (this->tcti_context);
-    g_mutex_clear (&this->mutex);
     free (this->tcti_context);
 }
 
 void
 TctiSgxSession::lock ()
 {
-    g_mutex_lock (&this->mutex);
+    this->mutex.lock ();
 }
 void
 TctiSgxSession::unlock ()
 {
-    g_mutex_unlock (&this->mutex);
+    this->mutex.unlock ();
 }
 
 TSS2_RC
@@ -177,9 +184,9 @@ tcti_sgx_init_ocall ()
         return 0;
     }
     session = new TctiSgxSession (id, tcti_context);
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     mgr.sessions.push_front (session);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
     return session->id;
 }
 
@@ -192,9 +199,9 @@ tcti_sgx_transmit_ocall (uint64_t id,
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     session = mgr.session_lookup (id);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -217,9 +224,9 @@ tcti_sgx_receive_ocall (uint64_t id,
     if (timeout != TSS2_TCTI_TIMEOUT_BLOCK)
         return TSS2_TCTI_RC_BAD_VALUE;
 
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     session = mgr.session_lookup (id);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -235,9 +242,9 @@ tcti_sgx_finalize_ocall (uint64_t id)
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
 
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     mgr.session_remove (id);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
 }
 
 TSS2_RC
@@ -247,9 +254,9 @@ tcti_sgx_cancel_ocall (uint64_t id)
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     session = mgr.session_lookup (id);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
@@ -274,9 +281,9 @@ tcti_sgx_set_locality_ocall (uint64_t id,
     TctiSgxSession *session;
     TSS2_RC ret;
 
-    g_mutex_lock (&mgr.session_table_mutex);
+    mgr.lock ();
     session = mgr.session_lookup (id);
-    g_mutex_unlock (&mgr.session_table_mutex);
+    mgr.unlock ();
     if (session == NULL)
         return TSS2_TCTI_RC_BAD_VALUE;
     session->lock ();
