@@ -56,7 +56,6 @@ AS_IF(
     ],
     [AC_MSG_ERROR([bad value for --enable-sim: $sim])])
 
-PKG_CHECK_MODULES([GLIB],[glib-2.0])
 PKG_CHECK_MODULES([TABRMD],[tss2-tcti-tabrmd >= 2.0])
 PKG_CHECK_MODULES([SGX_URTS],[libsgx_urts$SGX_SIM_SUFFIX >= 2.0])
 AX_CODE_COVERAGE

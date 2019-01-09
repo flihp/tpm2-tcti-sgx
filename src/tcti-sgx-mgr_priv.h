@@ -5,7 +5,6 @@
 #ifndef TCTI_SGX_MGR_PRIV_H
 #define TCTI_SGX_MGR_PRIV_H
 
-#include <glib.h>
 #include <list>
 #include <mutex>
 
@@ -31,16 +30,16 @@ public:
 class TctiSgxMgr {
 private:
     TctiSgxMgr (downstream_tcti_init_cb init_cb,
-                gpointer user_data);
+                void *user_data);
     TctiSgxMgr (TctiSgxMgr const&);
     void operator=(TctiSgxMgr const&);
 public:
     downstream_tcti_init_cb  init_cb;
-    gpointer user_data;
+    void *user_data;
     std::list <TctiSgxSession*> sessions;
     std::mutex sessions_mutex;
     static TctiSgxMgr& get_instance (downstream_tcti_init_cb init_cb,
-                                     gpointer user_data)
+                                     void *user_data)
     {
         static TctiSgxMgr instance (init_cb, user_data);
         return instance;

@@ -4,7 +4,6 @@
  */
 #include <errno.h>
 #include <fcntl.h>
-#include <glib.h>
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +49,7 @@ using namespace std;
  * the caller MUST hold the 'sessions_mutex'.
  */
 TctiSgxMgr::TctiSgxMgr (downstream_tcti_init_cb init_cb,
-                        gpointer user_data)
+                        void *user_data)
 : init_cb (init_cb), user_data (user_data) {}
 TctiSgxMgr::~TctiSgxMgr () {}
 
@@ -145,7 +144,7 @@ TctiSgxSession::set_locality (uint8_t locality)
  */
 int
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
-                   gpointer user_data)
+                   void *user_data)
 {
     if (callback == NULL) {
         callback = tabrmd_tcti_init;
@@ -162,7 +161,7 @@ tcti_sgx_init_ocall ()
 {
     TctiSgxSession *session;
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (tabrmd_tcti_init, NULL);
-    gint fd;
+    int fd;
     uint64_t id;
     TSS2_TCTI_CONTEXT *tcti_context;
 
