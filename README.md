@@ -15,6 +15,10 @@ SGX TCTI are familiar with:
 
 Please consult the relevant documentation before proceeding.
 
+## Build & Install
+Instructions to build and install this software are available in the
+INSTALL.md file.
+
 ## Contributing / Getting in touch
 If you're looking to discuss the source code in this project or get
 questions answered you should join the TPM2 mailing list:
