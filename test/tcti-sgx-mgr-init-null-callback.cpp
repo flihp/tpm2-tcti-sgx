@@ -19,7 +19,7 @@ tcti_sgx_mgr_init_null_callback (void **state)
     int ret = tcti_sgx_mgr_init (NULL, NULL);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     assert_int_equal (ret, 0);
-    assert_true (mgr.init_cb == tabrmd_tcti_init);
+    assert_true (mgr.init_cb == mssim_tcti_init);
 }
 
 int

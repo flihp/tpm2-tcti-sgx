@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-TSS2_TCTI_CONTEXT* tabrmd_tcti_init (void *user_data);
+TSS2_TCTI_CONTEXT* mssim_tcti_init (void *user_data);
 
 #if defined (__cplusplus)
 }

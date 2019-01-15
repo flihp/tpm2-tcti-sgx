@@ -81,8 +81,8 @@ src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
-src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(TABRMD_CFLAGS)
-src_libtcti_sgx_mgr_la_LIBADD = $(TABRMD_LIBS)
+src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(MSSIM_CFLAGS)
+src_libtcti_sgx_mgr_la_LIBADD = $(MSSIM_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
 # example application & enclave
@@ -116,63 +116,63 @@ test_libtest_a_SOURCES = test/tcti-sgx_null-wraps.c test/tcti-sgx-common.c
 test_tcti_sgx_init_param_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_init_param_tests_LDADD = src/libtss2-tcti-sgx.a \
-    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_init_param_tests_SOURCES = test/tcti-sgx-init-param-tests.c
 
 test_tcti_sgx_mgr_init_callback_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_callback_LDADD = src/libtcti-sgx-mgr.a \
-    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_callback_SOURCES = \
     test/tcti-sgx-mgr-init-callback.cpp
 
 test_tcti_sgx_mgr_init_null_callback_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_null_callback_LDADD = src/libtcti-sgx-mgr.a \
-    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_null_callback_SOURCES = \
     test/tcti-sgx-mgr-init-null-callback.cpp
 
 test_tcti_sgx_mgr_init_userdata_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_userdata_LDADD = src/libtcti-sgx-mgr.a \
-    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_userdata_SOURCES = test/tcti-sgx-mgr-init-userdata.cpp
 
 test_tcti_sgx_mgr_init_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(TABRMD_LIBS)
+    $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
-    $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS) -lstdc++
+    $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS) -lstdc++
 test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
     -Wl,--wrap=read,--wrap=free
 test_tcti_sgx_mgr_init_tests_SOURCES = test/tcti-sgx-mgr-init-tests.cpp
 
 test_tcti_sgx_mgr_ocall_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(TABRMD_LIBS)
+    $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_ocall_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
-    $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS) -lstdc++
+    $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS) -lstdc++
 test_tcti_sgx_mgr_ocall_tests_SOURCES = test/tcti-sgx-mgr-ocall-tests.cpp
 
 test_tcti_sgx_struct_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_struct_tests_LDADD = src/libtss2-tcti-sgx.a \
-    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    test/libtest.a $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_struct_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_struct_tests_SOURCES = test/tcti-sgx-struct-tests.c
 
 test_tcti_sgx_call_tests_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS) 
 test_tcti_sgx_call_tests_LDADD = src/libtss2-tcti-sgx.a test/libtest.a \
-    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_call_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_call_tests_SOURCES = test/tcti-sgx-call-tests.c
 
 test_tcti_util_CFLAGS  = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
     $(CODE_COVERAGE_CFLAGS)
 test_tcti_util_LDADD = src/libtcti-sgx-mgr.a \
-    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(TABRMD_LIBS)
-test_tcti_util_LDFLAGS = -Wl,--wrap=Tss2_Tcti_Tabrmd_Init,--wrap=calloc,--wrap=free
+    $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
+test_tcti_util_LDFLAGS = -Wl,--wrap=Tss2_Tcti_Mssim_Init,--wrap=calloc,--wrap=free
 test_tcti_util_SOURCES = test/tcti-util.c
 
 AUTHORS :

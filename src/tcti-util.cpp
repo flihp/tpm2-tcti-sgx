@@ -9,19 +9,19 @@
 #include <stdlib.h>
 
 #include <tss2/tss2_tcti.h>
-#include <tss2/tss2-tcti-tabrmd.h>
+#include <tss2/tss2_tcti_mssim.h>
 
 #include "tcti-util.h"
 
 TSS2_TCTI_CONTEXT*
-tabrmd_tcti_init (void *user_data)
+mssim_tcti_init (void *user_data)
 {
     const char* conf_str = (const char*)user_data;
     TSS2_TCTI_CONTEXT* ctx = NULL;
     TSS2_RC rc = TSS2_RC_SUCCESS;
     size_t size = 0;
 
-    rc = Tss2_Tcti_Tabrmd_Init (NULL, &size, NULL);
+    rc = Tss2_Tcti_Mssim_Init (NULL, &size, NULL);
     if (rc != TSS2_RC_SUCCESS) {
         printf ("%s: first call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
                 PRIx32 "\n", __func__, rc);
@@ -32,7 +32,7 @@ tabrmd_tcti_init (void *user_data)
         printf ("%s: Failed to allocate context object: %s", __func__, strerror (errno));
         return NULL;
     }
-    rc = Tss2_Tcti_Tabrmd_Init (ctx, &size, conf_str);
+    rc = Tss2_Tcti_Mssim_Init (ctx, &size, conf_str);
     if (rc != TSS2_RC_SUCCESS) {
         printf ("%s: second call to Tss2_Tcti_Tabrmd_Init failed with RC 0x%"
                 PRIx32 "\n", __func__, rc);

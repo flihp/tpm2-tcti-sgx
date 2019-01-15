@@ -10,7 +10,6 @@
 #include <unistd.h>
 
 #include <tss2/tss2_tcti.h>
-#include <tss2/tss2-tcti-tabrmd.h>
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
@@ -147,7 +146,7 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    void *user_data)
 {
     if (callback == NULL) {
-        callback = tabrmd_tcti_init;
+        callback = mssim_tcti_init;
     }
     TctiSgxMgr::get_instance (callback, user_data);
     return 0;
@@ -160,7 +159,7 @@ uint64_t
 tcti_sgx_init_ocall ()
 {
     TctiSgxSession *session;
-    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (tabrmd_tcti_init, NULL);
+    TctiSgxMgr& mgr = TctiSgxMgr::get_instance (mssim_tcti_init, NULL);
     int fd;
     uint64_t id;
     TSS2_TCTI_CONTEXT *tcti_context;

@@ -59,7 +59,7 @@ public:
 extern "C" {
 #endif
 
-TSS2_TCTI_CONTEXT* tabrmd_tcti_init (void *user_data);
+TSS2_TCTI_CONTEXT* mssim_tcti_init (void *user_data);
 uint64_t tcti_sgx_init_ocall ();
 TSS2_RC tcti_sgx_transmit_ocall (uint64_t id,
                                  size_t size,
