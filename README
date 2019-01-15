@@ -1,5 +1,0 @@
-This is an implementation of a TPM command transmission interface (TCTI).
-It is designed for use within an software guard extensions (SGX) enclave.
-The SGX TCTI provides a mechanism for transporting TPM commands across the
-enclave boundary. The application hosting the enclave is responsible for
-propagating these commands to the the TPM.

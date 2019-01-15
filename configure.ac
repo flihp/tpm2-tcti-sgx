@@ -8,7 +8,7 @@ AC_INIT([tpm2-tcti-sgx],
 AC_PROG_CC
 AC_PROG_CXX
 LT_INIT
-AM_INIT_AUTOMAKE([subdir-objects] [-Wno-portability])
+AM_INIT_AUTOMAKE([foreign subdir-objects] [-Wno-portability])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_MACRO_DIRS([m4])
 
