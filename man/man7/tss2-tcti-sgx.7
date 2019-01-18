@@ -1,0 +1,24 @@
+.\" Process this file with
+.\" groff -man -Tascii tss2-tcti-sgx.7
+.\"
+.TH TSS2-TCTI-SGX 7 "JANUARY 2019" Intel "TPM2 Software Stack"
+.SH NAME
+tss2-tcti-sgx \- SGX TCTI library
+.SH SYNOPSIS
+A TPM2 Command Transmission Interface (TCTI) module for use from within an
+SGX enclave.
+.SH DESCRIPTION
+tss2-tcti-sgx is a library that maps the standard TCTI functions to SGX
+SGX ocalls. A companion management library is required in the application
+hosting the enclave to provide the ocall implementation.
+The interface exposed by this library is defined in the \*(lqTCG TSS 2.0
+TPM Command Transmission Interface Specification\*(rq.
+.SH AUTHOR
+Philip Tricca <philip.b.tricca@intel.com>
+.SH "SEE ALSO"
+.BR Tss2_Tcti_Sgx_Init (3),
+.BR tss2-sys (8)
+.SH COLOPHON
+A description of the tpm2-software project, information about reporting
+bugs, and the latest version of this page can be found at
+\%https://github.com/tpm2-software/tpm2-tcti-sgx
