@@ -22,6 +22,7 @@ lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtcti-sgx-mgr.a src/libtss2-tcti-sgx.a
 noinst_LIBRARIES = test/libtest.a
 noinst_PROGRAMS = example/application
+man3_MANS = man/man3/Tss2_Tcti_Sgx_Init.3
 man7_MANS = man/man7/tss2-tcti-sgx.7
 
 all-local: \
