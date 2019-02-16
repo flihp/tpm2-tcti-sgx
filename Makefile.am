@@ -7,6 +7,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -fPIC
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \
+    example/application \
     example/enclave-signed.so \
     example/enclave.so \
     example/enclave_t.h \
@@ -15,17 +16,18 @@ CLEANFILES = \
     example/enclave_u.c \
     example/rsa3k.pem
 
-BUILT_SOURCES = $(CLEANFILES)
+BUILT_SOURCES = example/enclave_t.h \
+    example/enclave_t.c \
+    example/enclave_u.h \
+    example/enclave_u.c
 
 # things we're building
 lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtcti-sgx-mgr.a src/libtss2-tcti-sgx.a
 noinst_LIBRARIES = test/libtest.a
-noinst_PROGRAMS = example/application
+EXTRA_PROGRAMS = example/application
 dist_man3_MANS = man/man3/Tss2_Tcti_Sgx_Init.3
 dist_man7_MANS = man/man7/tss2-tcti-sgx.7
-all-local: \
-    example/enclave-signed.so
 
 # connect unit tests to the test harness
 if UNIT
@@ -41,6 +43,8 @@ check_PROGRAMS  = \
     test/tcti-util
 endif
 TESTS = $(check_PROGRAMS)
+
+example: example/application example/enclave-signed.so
 
 # headers and where to install them
 libtss2_tcti_sgxdir = $(includedir)/tss2
@@ -88,12 +92,12 @@ src_libtcti_sgx_mgr_la_LIBADD = $(MSSIM_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
 # example application & enclave
+example/example_application-application.$(OBJEXT): example/enclave_u.h
 example_application_CFLAGS = $(AM_CFLAGS) $(SGX_URTS_CFLAGS) \
     -I$(builddir)/example
 example_application_LDADD = src/libtcti-sgx-mgr.la $(SGX_URTS_LIBS)
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
-example/application.$(OBJEXT): example/enclave_u.c
 example/enclave.$(OBJECT): example/enclave_t.c
 
 example/.deps:
