@@ -22,9 +22,8 @@ lib_LTLIBRARIES = src/libtcti-sgx-mgr.la
 lib_LIBRARIES = src/libtcti-sgx-mgr.a src/libtss2-tcti-sgx.a
 noinst_LIBRARIES = test/libtest.a
 noinst_PROGRAMS = example/application
-man3_MANS = man/man3/Tss2_Tcti_Sgx_Init.3
-man7_MANS = man/man7/tss2-tcti-sgx.7
-
+dist_man3_MANS = man/man3/Tss2_Tcti_Sgx_Init.3
+dist_man7_MANS = man/man7/tss2-tcti-sgx.7
 all-local: \
     example/enclave-signed.so
 
@@ -54,6 +53,7 @@ EXTRA_DIST = \
     example/enclave.c \
     example/enclave.edl \
     example/example.config.xml \
+    src/tcti-util.h \
     src/tcti-sgx_priv.h \
     src/tcti-sgx-mgr_priv.h \
     src/tss2_tcti_sgx.edl \
