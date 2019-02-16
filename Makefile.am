@@ -94,6 +94,7 @@ example_application_LDADD = src/libtcti-sgx-mgr.la $(SGX_URTS_LIBS)
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/application.$(OBJEXT): example/enclave_u.c
+example/enclave.$(OBJECT): example/enclave_t.c
 
 example/.deps:
 	mkdir -p $@
