@@ -1,8 +1,6 @@
 # Copyright 2016 - 2018, Intel Corporation
 # SPDX-License-Identifier: BSD-2-Clause
 VPATH = $(srcdir) $(builddir)
-include sgx_sdk.mk
-
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -fPIC
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
@@ -106,7 +104,9 @@ example/enclave_%.$(OBJEXT): example/enclave_%.c | example/.deps
 
 example/enclave.so: CFLAGS+=$(ENCLAVE_CFLAGS) -I$(builddir)/example
 example/enclave.so: LDFLAGS+=$(SGX_LIBS_ONLY_L) $(ENCLAVE_LDFLAGS)
-example/enclave.so: LDLIBS+=$(ENCLAVE_LDLIBS)
+example/enclave.so: LDLIBS+=-Wl,--whole-archive -l$(SGX_TRTS_LIB) \
+    -Wl,--no-whole-archive -Wl,--start-group -lsgx_tstdc -lsgx_tcrypto \
+    -l$(SGX_TSERVICE_LIB) -Wl,--end-group
 example/enclave.so: example/enclave_t.$(OBJEXT) example/enclave.$(OBJEXT) src/libtss2-tcti-sgx.a
 	$(CC) $(LDFLAGS) $^ -o $@ -Bstatic $(LDLIBS)
 
@@ -185,3 +185,13 @@ test_tcti_util_SOURCES = test/tcti-util.c
 AUTHORS :
 	git log --format='%aN <%aE>' | grep -v 'users.noreply.github.com' | sort | \
 	    uniq -c | sort -nr | sed 's/^\s*//' | cut -d" " -f2- > $@
+
+ENCLAVE_SEARCH_PATH = --search-path $(srcdir)/src \
+    --search-path $(SGX_INCLUDE_DIR)
+
+%_u.h %_u.c : %.edl
+	$(SGX_EDGER8R_BIN) --untrusted $(ENCLAVE_SEARCH_PATH) \
+	    --untrusted-dir ${subst $(srcdir),$(builddir),$(dir $^)} $^
+%_t.h %_t.c : %.edl
+	$(SGX_EDGER8R_BIN) --trusted $(ENCLAVE_SEARCH_PATH) \
+	    --trusted-dir ${subst $(srcdir),$(builddir),$(dir $^)} $^
