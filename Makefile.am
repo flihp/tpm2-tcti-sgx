@@ -80,14 +80,14 @@ CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
    "$(abs_top_srcdir)/src/tcti_sgx_u.*"
 
 # enclave library
-src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS)
+src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 
 # application library
-src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS)
+src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
-src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(MSSIM_CFLAGS)
+src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(MSSIM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 src_libtcti_sgx_mgr_la_LIBADD = $(MSSIM_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
