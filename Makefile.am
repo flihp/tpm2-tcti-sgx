@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 VPATH = $(srcdir) $(builddir)
 ACLOCAL_AMFLAGS = -I m4
-AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -fPIC
+AM_CFLAGS = $(EXTRA_CFLAGS) -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src
 AM_CXXFLAGS = $(AM_CFLAGS) $(EXTRA_CXXFLAGS)
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \

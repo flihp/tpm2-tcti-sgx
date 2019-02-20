@@ -133,6 +133,7 @@ AC_DEFUN(
     ]
 )
 
+ADD_COMPILER_FLAG([-fPIC],[EXTRA_CFLAGS])
 # CFLAGS used when building code that runs in the enclave
 ADD_COMPILER_FLAG([-fvisibility=hidden],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
