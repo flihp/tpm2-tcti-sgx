@@ -3,6 +3,7 @@
 VPATH = $(srcdir) $(builddir)
 ACLOCAL_AMFLAGS = -I m4
 AM_CFLAGS = -I$(SGX_INCLUDE_DIR) -I$(srcdir)/src -fPIC
+AM_CXXFLAGS = $(AM_CFLAGS) $(EXTRA_CXXFLAGS)
 ENCLAVE_CFLAGS += -I$(SGX_INCLUDE_DIR)/tlibc
 CLEANFILES = \
     example/application \
@@ -82,10 +83,10 @@ src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS) $(CODE_COVERAGE_
 src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 
 # application library
-src_libtcti_sgx_mgr_a_CXXFLAGS  = $(AM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+src_libtcti_sgx_mgr_a_CXXFLAGS = $(AM_CXXFLAGS) $(CODE_COVERAGE_CFLAGS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
-src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CFLAGS) $(MSSIM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CXXFLAGS) $(MSSIM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 src_libtcti_sgx_mgr_la_LIBADD = $(MSSIM_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
@@ -127,36 +128,36 @@ test_tcti_sgx_init_param_tests_LDADD = src/libtss2-tcti-sgx.a \
 test_tcti_sgx_init_param_tests_LDFLAGS = $(CMOCKA_WRAPS)
 test_tcti_sgx_init_param_tests_SOURCES = test/tcti-sgx-init-param-tests.c
 
-test_tcti_sgx_mgr_init_callback_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS)
+test_tcti_sgx_mgr_init_callback_CXXFLAGS = $(AM_CXXFLAGS) \
+    $(CMOCKA_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_callback_LDADD = src/libtcti-sgx-mgr.a \
     $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_callback_SOURCES = \
     test/tcti-sgx-mgr-init-callback.cpp
 
-test_tcti_sgx_mgr_init_null_callback_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS)
+test_tcti_sgx_mgr_init_null_callback_CXXFLAGS = $(AM_CXXFLAGS) \
+    $(CMOCKA_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_null_callback_LDADD = src/libtcti-sgx-mgr.a \
     $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_null_callback_SOURCES = \
     test/tcti-sgx-mgr-init-null-callback.cpp
 
-test_tcti_sgx_mgr_init_userdata_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS)
+test_tcti_sgx_mgr_init_userdata_CXXFLAGS = $(AM_CXXFLAGS) \
+    $(CMOCKA_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 test_tcti_sgx_mgr_init_userdata_LDADD = src/libtcti-sgx-mgr.a \
     $(CMOCKA_LIBS) $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_userdata_SOURCES = test/tcti-sgx-mgr-init-userdata.cpp
 
-test_tcti_sgx_mgr_init_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
+test_tcti_sgx_mgr_init_tests_CXXFLAGS = $(AM_CXXFLAGS) \
+    $(CMOCKA_CFLAGS) $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_init_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS) -lstdc++
 test_tcti_sgx_mgr_init_tests_LDFLAGS = -Wl,--wrap=calloc,--wrap=open \
     -Wl,--wrap=read,--wrap=free
 test_tcti_sgx_mgr_init_tests_SOURCES = test/tcti-sgx-mgr-init-tests.cpp
 
-test_tcti_sgx_mgr_ocall_tests_CXXFLAGS = $(CMOCKA_CFLAGS) $(AM_CFLAGS) \
-    $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
+test_tcti_sgx_mgr_ocall_tests_CXXFLAGS = $(AM_CXXFLAGS) \
+    $(CMOCKA_CFLAGS) $(CODE_COVERAGE_CFLAGS) $(MSSIM_LIBS)
 test_tcti_sgx_mgr_ocall_tests_LDADD = src/libtcti-sgx-mgr.a $(CMOCKA_LIBS) \
     $(CODE_COVERAGE_LIBS) $(MSSIM_LIBS) -lstdc++
 test_tcti_sgx_mgr_ocall_tests_SOURCES = test/tcti-sgx-mgr-ocall-tests.cpp

@@ -112,10 +112,32 @@ AC_DEFUN(
         [-Werror]
     )]
 )
+dnl ADD_CXX_COMPILER_FLAG:
+dnl   A macro to add a compiler flags to the provided variable. This macro
+dnl   will check to be sure the compiler supports the flag. Unsupported
+dnl   flags will cause the configure script to fail.
+dnl $1: C++ compiler flag to check and add.
+dnl $2: Add flags to this variable.
+AC_DEFUN(
+    [ADD_CXX_COMPILER_FLAG],
+    [AC_LANG_PUSH([C++])
+     AX_CHECK_COMPILE_FLAG(
+        [$1],
+        [
+            $2="$$2 $1"
+            AC_SUBST([$2])
+        ],
+        [AC_MSG_ERROR([Unsupported compile flag: $1])],
+        [-Werror])
+     AC_LANG_POP([C++])
+    ]
+)
+
 # CFLAGS used when building code that runs in the enclave
 ADD_COMPILER_FLAG([-fvisibility=hidden],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fstack-protector],[ENCLAVE_CFLAGS])
+ADD_CXX_COMPILER_FLAG([-std=c++11],[EXTRA_CXXFLAGS])
 
 AC_DEFUN(
     [ADD_LINK_FLAG],
