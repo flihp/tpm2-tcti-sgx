@@ -27,7 +27,7 @@ AS_IF(
     [
     PKG_CHECK_MODULES(
         [CMOCKA],
-        [cmocka >= 1.1],
+        [cmocka >= 1.0],
         [],
         [AC_MSG_ERROR([cmocka version must be > 1.1])])
     ])
