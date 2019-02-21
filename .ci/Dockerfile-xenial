@@ -1,0 +1,27 @@
+FROM ubuntu:xenial AS build
+
+ARG PREFIX=/usr
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update && apt-get install -y \
+    autoconf \
+    automake \
+    build-essential \
+    git \
+    gnulib \
+    lcov \
+    libcmocka-dev \
+    libcurl4-openssl-dev \
+    libprotobuf-dev \
+    libssl-dev \
+    libtool \
+    ocaml \
+    pkg-config \
+    protobuf-compiler \
+    python \
+    sudo \
+    wget
+
+WORKDIR /tmp/sgx-sdk
+COPY ./.ci/build-deps.sh ./
+RUN sh -x ./build-deps.sh
