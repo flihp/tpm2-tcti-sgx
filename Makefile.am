@@ -74,7 +74,8 @@ CMOCKA_WRAPS = \
 
 # code covear
 @CODE_COVERAGE_RULES@
-CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" "$(abs_top_srcdir)/test/*" \
+CODE_COVERAGE_DIRECTORY = $(top_builddir)/src
+CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" \
    "$(abs_top_srcdir)/src/tcti_sgx_t.*" \
    "$(abs_top_srcdir)/src/tcti_sgx_u.*"
 
