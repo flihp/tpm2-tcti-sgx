@@ -76,8 +76,8 @@ CMOCKA_WRAPS = \
 @CODE_COVERAGE_RULES@
 CODE_COVERAGE_DIRECTORY = $(top_builddir)/src
 CODE_COVERAGE_IGNORE_PATTERN = "/usr/*" \
-   "$(abs_top_srcdir)/src/tcti_sgx_t.*" \
-   "$(abs_top_srcdir)/src/tcti_sgx_u.*"
+   "$(top_srcdir)/src/tcti_sgx_t.*" \
+   "$(top_srcdir)/src/tcti_sgx_u.*"
 
 # enclave library
 src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
