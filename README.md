@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/flihp/tpm2-tcti-sgx.svg?branch=master)](https://travis-ci.org/flihp/tpm2-tcti-sgx)
+[![Coverage Status](https://coveralls.io/repos/github/flihp/tpm2-tcti-sgx/badge.svg)](https://coveralls.io/github/flihp/tpm2-tcti-sgx)
+
 # SGX TCTI
 This is an implementation of a TPM command transmission interface (TCTI).
 It conforms to the TCG TSS2 TCTI specification version 1.0. It is
