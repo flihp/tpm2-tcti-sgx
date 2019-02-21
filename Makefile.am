@@ -94,7 +94,7 @@ src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 example/example_application-application.$(OBJEXT): example/enclave_u.h
 example_application_CFLAGS = $(AM_CFLAGS) $(SGX_URTS_CFLAGS) \
     -I$(builddir)/example
-example_application_LDADD = src/libtcti-sgx-mgr.la $(SGX_URTS_LIBS)
+example_application_LDADD = src/libtcti-sgx-mgr.la $(SGX_URTS_LIBS) -lpthread
 example_application_SOURCES = example/application.c example/enclave_ocalls.c
 nodist_example_application_SOURCES = example/enclave_u.c
 example/enclave.$(OBJECT): example/enclave_t.c
