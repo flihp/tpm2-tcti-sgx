@@ -24,6 +24,11 @@
 using namespace std;
 
 #define RAND_SRC "/dev/urandom"
+#if defined(__GNUC__)
+#define SO_EXPORT __attribute__ ((visibility ("default")))
+#else
+#error "Unsupported compiler."
+#endif
 
 /*
  * This code module contains the logic that we need to process 'ocalls'
@@ -141,7 +146,7 @@ TctiSgxSession::set_locality (uint8_t locality)
  * instance used to communicate with the 'downstream' TPM. This allows for
  * flexible configuration by the application hosting the enclave.
  */
-int
+int SO_EXPORT
 tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
                    void *user_data)
 {
@@ -155,7 +160,7 @@ tcti_sgx_mgr_init (downstream_tcti_init_cb callback,
 /*
  * function called by enclave to initialize new TCTI connection
  */
-uint64_t
+uint64_t SO_EXPORT
 tcti_sgx_init_ocall ()
 {
     TctiSgxSession *session;
@@ -188,7 +193,7 @@ tcti_sgx_init_ocall ()
     return session->id;
 }
 
-TSS2_RC
+TSS2_RC SO_EXPORT
 tcti_sgx_transmit_ocall (uint64_t id,
                          size_t size,
                          const uint8_t *command)
@@ -208,7 +213,7 @@ tcti_sgx_transmit_ocall (uint64_t id,
     return ret;
 }
 
-TSS2_RC
+TSS2_RC SO_EXPORT
 tcti_sgx_receive_ocall (uint64_t id,
                         size_t size,
                         uint8_t *response,
@@ -234,7 +239,7 @@ tcti_sgx_receive_ocall (uint64_t id,
     return ret;
 }
 
-void
+void SO_EXPORT
 tcti_sgx_finalize_ocall (uint64_t id)
 {
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
@@ -245,7 +250,7 @@ tcti_sgx_finalize_ocall (uint64_t id)
     mgr.unlock ();
 }
 
-TSS2_RC
+TSS2_RC SO_EXPORT
 tcti_sgx_cancel_ocall (uint64_t id)
 {
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
@@ -263,7 +268,7 @@ tcti_sgx_cancel_ocall (uint64_t id)
     return ret;
 }
 
-TSS2_RC
+TSS2_RC SO_EXPORT
 tcti_sgx_get_poll_handles_ocall (uint64_t id,
                                  TSS2_TCTI_POLL_HANDLE *handles,
                                  size_t *num_handles)
@@ -271,7 +276,7 @@ tcti_sgx_get_poll_handles_ocall (uint64_t id,
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 
-TSS2_RC
+TSS2_RC SO_EXPORT
 tcti_sgx_set_locality_ocall (uint64_t id,
                              uint8_t locality)
 {
