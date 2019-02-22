@@ -138,6 +138,7 @@ AC_DEFUN(
 ADD_COMPILER_FLAG([-fPIC])
 ADD_COMPILER_FLAG([-Wall])
 ADD_COMPILER_FLAG([-Werror])
+ADD_COMPILER_FLAG([-Wextra])
 ADD_CXX_COMPILER_FLAG([-std=c++11])
 AS_IF([test "$CODE_COVERAGE_ENABLED" = "no"],
       [ADD_COMPILER_FLAG([-fvisibility=hidden])])
