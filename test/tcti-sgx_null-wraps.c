@@ -18,6 +18,8 @@
 
 #include <tss2/tss2_tpm2_types.h>
 
+#include "util.h"
+
 /*
  * This is a mock function for the initialization OCall.
  * Instead of actually calling out to the external RM/TAB
@@ -37,6 +39,10 @@ __wrap_tcti_sgx_transmit_ocall (TSS2_RC *retval,
                                 size_t size,
                                 const uint8_t* command)
 {
+    UNUSED (id);
+    UNUSED (size);
+    UNUSED (command);
+
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
@@ -48,18 +54,25 @@ __wrap_tcti_sgx_receive_ocall (TSS2_RC *retval,
                                uint8_t *response,
                                uint32_t timeout)
 {
+    UNUSED (id);
+    UNUSED (size);
+    UNUSED (response);
+    UNUSED (timeout);
+
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
 
 void
 __wrap_tcti_sgx_finalize_ocall (uint64_t *retval)
-{}
+{ UNUSED (retval); }
 
 sgx_status_t
 __wrap_tcti_sgx_cancel_ocall (TSS2_RC *retval,
                               uint64_t id)
 {
+    UNUSED (id);
+
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }
@@ -69,6 +82,9 @@ __wrap_tcti_sgx_set_locality_ocall (TSS2_RC *retval,
                                     uint64_t id,
                                     uint8_t locality)
 {
+    UNUSED (id);
+    UNUSED (locality);
+
     *retval = (TSS2_RC)mock ();
     return (sgx_status_t)mock ();
 }

@@ -16,6 +16,7 @@ extern "C" {
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
+#include "util.h"
 
 enum calloc_flag {
     null,
@@ -115,19 +116,21 @@ __wrap_read (int fd,
 TSS2_TCTI_CONTEXT*
 callback_ctx (void *user_data)
 {
-    printf ("%s: floop\n", __func__);
+    UNUSED (user_data);
     return mock_type (TSS2_TCTI_CONTEXT*);
 }
 
 static int
 tcti_sgx_mgr_init_setup(void **state)
 {
+    UNUSED (state);
     return tcti_sgx_mgr_init (callback_ctx, NULL);
 }
 
 static void
 tcti_sgx_mgr_init_ocall_open_fail (void **state)
 {
+    UNUSED (state);
     will_return (__wrap_open, EACCES);
     will_return (__wrap_open, -1);
     uint64_t id = tcti_sgx_init_ocall ();
@@ -137,6 +140,7 @@ tcti_sgx_mgr_init_ocall_open_fail (void **state)
 static void
 tcti_sgx_mgr_init_ocall_read_fail (void **state)
 {
+    UNUSED (state);
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
     will_return (__wrap_read, EACCES);
@@ -150,6 +154,7 @@ tcti_sgx_mgr_init_ocall_read_fail (void **state)
 static void
 tcti_sgx_mgr_init_ocall_cb_fail (void **state)
 {
+    UNUSED (state);
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
     will_return (__wrap_read, 0);
@@ -163,6 +168,7 @@ tcti_sgx_mgr_init_ocall_cb_fail (void **state)
 static void
 tcti_sgx_mgr_init_ocall_success (void **state)
 {
+    UNUSED (state);
     will_return (__wrap_open, 0);
     will_return (__wrap_open, TEST_FD);
     will_return (__wrap_read, 0);

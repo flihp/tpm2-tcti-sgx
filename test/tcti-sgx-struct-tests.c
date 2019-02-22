@@ -134,7 +134,7 @@ tcti_struct_state_test (void **state)
 }
 
 int
-main(int argc, char* argv[])
+main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown (tcti_struct_magic_test,

@@ -12,15 +12,18 @@ extern "C" {
 }
 
 #include "tcti-sgx-mgr_priv.h"
+#include "util.h"
 
 static TSS2_TCTI_CONTEXT*
 tcti_init (void *user_data)
 {
+    UNUSED (user_data);
     return NULL;
 }
 static void
 tcti_sgx_mgr_init_callback (void **state)
 {
+    UNUSED (state);
     int ret = tcti_sgx_mgr_init (tcti_init, NULL);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     assert_int_equal (ret, 0);

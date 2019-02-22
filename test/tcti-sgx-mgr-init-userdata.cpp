@@ -12,10 +12,13 @@ extern "C" {
 }
 
 #include "tcti-sgx-mgr_priv.h"
+#include "util.h"
 
 static void
 tcti_sgx_mgr_init_userdata (void **state)
 {
+    UNUSED (state);
+
     int tmp = 0;
     int ret = tcti_sgx_mgr_init (NULL, &tmp);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);

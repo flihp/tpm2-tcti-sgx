@@ -6,6 +6,7 @@
 
 #include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
+#include "util.h"
 
 /*
  * These function prototypes and their implementation (edge routines) are
@@ -201,6 +202,9 @@ tcti_sgx_get_poll_handles (TSS2_TCTI_CONTEXT *tcti_context,
                            TSS2_TCTI_POLL_HANDLE *handles,
                            size_t *num_handles)
 {
+    UNUSED (handles);
+    UNUSED (num_handles);
+
     if (tcti_context == NULL ||
         TSS2_TCTI_MAGIC (tcti_context) != TCTI_SGX_MAGIC) {
         return TSS2_TCTI_RC_BAD_CONTEXT;
