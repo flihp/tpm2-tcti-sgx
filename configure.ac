@@ -162,6 +162,7 @@ AC_DEFUN(
         [-Werror -Wl,-fuse-ld=gold]
     )]
 )
+ADD_LINK_FLAG([-Wl,-fuse-ld=gold])
 ADD_LINK_FLAG([-Wl,--no-undefined],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-nostdlib],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-nostartfiles],[ENCLAVE_LDFLAGS])
@@ -171,7 +172,6 @@ ADD_LINK_FLAG([-pie],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-Wl,-eenclave_entry],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-Wl,--export-dynamic],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-Wl,--defsym,__ImageBase=0],[ENCLAVE_LDFLAGS])
-ADD_LINK_FLAG([-Wl,-fuse-ld=gold],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-Wl,--rosegment],[ENCLAVE_LDFLAGS])
 
 # we need the path for SGX libraries for static linking
