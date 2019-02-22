@@ -14,8 +14,7 @@
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
 #include "tcti-util.h"
-
-#include "tcti-util.h"
+#include "util.h"
 
 #include <iostream>
 #include <list>
@@ -272,6 +271,9 @@ tcti_sgx_get_poll_handles_ocall (uint64_t id,
                                  TSS2_TCTI_POLL_HANDLE *handles,
                                  size_t *num_handles)
 {
+    UNUSED (id);
+    UNUSED (handles);
+    UNUSED (num_handles);
     return TSS2_TCTI_RC_NOT_IMPLEMENTED;
 }
 

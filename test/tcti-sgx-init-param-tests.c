@@ -14,6 +14,7 @@
 
 #include "tss2-tcti-sgx.h"
 #include "tcti-sgx_priv.h"
+#include "util.h"
 
 /*
  * when given an NULL context and a pointer to a size_t, set the size_t
@@ -22,6 +23,7 @@
 static void
 tcti_sgx_init_size_test (void **state)
 {
+    UNUSED (state);
     size_t tcti_size;
 
     Tss2_Tcti_Sgx_Init (NULL, &tcti_size);
@@ -34,6 +36,7 @@ tcti_sgx_init_size_test (void **state)
 static void
 tcti_sgx_init_success_return_value_test (void **state)
 {
+    UNUSED (state);
     size_t tcti_size;
     TSS2_RC ret;
 
@@ -47,6 +50,7 @@ tcti_sgx_init_success_return_value_test (void **state)
 static void
 tcti_sgx_init_allnull_is_bad_value (void **state)
 {
+    UNUSED (state);
     TSS2_RC ret;
 
     ret = Tss2_Tcti_Sgx_Init (NULL, NULL);
@@ -63,6 +67,7 @@ tcti_sgx_init_allnull_is_bad_value (void **state)
 static void
 tcti_sgx_init_success_mock_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC ret;
     TSS2_TCTI_CONTEXT *ctx = calloc (1, sizeof (TCTI_CONTEXT_SGX));
 
@@ -74,7 +79,7 @@ tcti_sgx_init_success_mock_ocall (void **state)
     assert_int_equal (ret, TSS2_RC_SUCCESS);
 }
 int
-main(int argc, char* argv[])
+main()
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test (tcti_sgx_init_size_test),

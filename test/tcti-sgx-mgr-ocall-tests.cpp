@@ -14,12 +14,17 @@ extern "C" {
 
 #include "tcti-sgx-mgr_priv.h"
 #include "tcti-sgx-mgr.h"
+#include "util.h"
 
 static TSS2_RC
 mock_transmit (TSS2_TCTI_CONTEXT *ctx,
                size_t size,
                uint8_t const *command)
 {
+    UNUSED (ctx);
+    UNUSED (size);
+    UNUSED (command);
+
     return mock_type (TSS2_RC);
 }
 
@@ -29,12 +34,19 @@ mock_receive (TSS2_TCTI_CONTEXT *ctx,
               uint8_t *response,
               int32_t timeout)
 {
+    UNUSED (ctx);
+    UNUSED (size);
+    UNUSED (response);
+    UNUSED (timeout);
+
     return mock_type (TSS2_RC);
 }
 
 static TSS2_RC
 mock_cancel (TSS2_TCTI_CONTEXT *ctx)
 {
+    UNUSED (ctx);
+
     return mock_type (TSS2_RC);
 }
 
@@ -42,12 +54,16 @@ static TSS2_RC
 mock_set_locality (TSS2_TCTI_CONTEXT *ctx,
                    uint8_t locality)
 {
+    UNUSED (ctx);
+    UNUSED (locality);
+
     return mock_type (TSS2_RC);
 }
 
 TSS2_TCTI_CONTEXT*
 test_tcti_cb (void *user_data)
 {
+    UNUSED (user_data);
     TSS2_TCTI_CONTEXT_COMMON_V2 *ctx;
 
     ctx = (TSS2_TCTI_CONTEXT_COMMON_V2*)calloc (1, sizeof (TSS2_TCTI_CONTEXT_COMMON_V2));
@@ -64,6 +80,7 @@ test_tcti_cb (void *user_data)
 static int
 tcti_sgx_mgr_ocalls_setup (void **state)
 {
+    UNUSED (state);
     tcti_sgx_mgr_init (test_tcti_cb, NULL);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance ();
     TctiSgxSession *session = new TctiSgxSession (GOOD_ID, test_tcti_cb (NULL));
@@ -76,6 +93,7 @@ tcti_sgx_mgr_ocalls_setup (void **state)
 static int
 tcti_sgx_mgr_ocalls_teardown (void **state)
 {
+    UNUSED (state);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance ();
 
     mgr.session_remove (GOOD_ID);
@@ -85,6 +103,7 @@ tcti_sgx_mgr_ocalls_teardown (void **state)
 static void
 tcti_sgx_mgr_transmit_ocall_bad_id (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     rc = tcti_sgx_transmit_ocall (BAD_ID, 0, NULL);
@@ -94,6 +113,7 @@ tcti_sgx_mgr_transmit_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_transmit_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
     uint8_t buf [12] = { 0 };
 
@@ -105,6 +125,7 @@ tcti_sgx_mgr_transmit_ocall (void **state)
 static void
 tcti_sgx_mgr_receive_ocall_bad_timeout (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     rc = tcti_sgx_receive_ocall (GOOD_ID, 0, NULL, 1);
@@ -114,6 +135,7 @@ tcti_sgx_mgr_receive_ocall_bad_timeout (void **state)
 static void
 tcti_sgx_mgr_receive_ocall_bad_id (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     rc = tcti_sgx_receive_ocall (BAD_ID, 0, NULL, TSS2_TCTI_TIMEOUT_BLOCK);
@@ -123,6 +145,7 @@ tcti_sgx_mgr_receive_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_receive_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
     uint8_t buf [10] = { 0 };
 
@@ -134,18 +157,21 @@ tcti_sgx_mgr_receive_ocall (void **state)
 static void
 tcti_sgx_mgr_finalize_ocall_bad_id (void **state)
 {
+    UNUSED (state);
     tcti_sgx_finalize_ocall (BAD_ID);
 }
 
 static void
 tcti_sgx_mgr_finalize_ocall (void **state)
 {
+    UNUSED (state);
     tcti_sgx_finalize_ocall (GOOD_ID);
 }
 
 static void
 tcti_sgx_mgr_cancel_ocall_bad_id (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     rc = tcti_sgx_cancel_ocall (BAD_ID);
@@ -155,6 +181,7 @@ tcti_sgx_mgr_cancel_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_cancel_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     will_return (mock_cancel, TSS2_RC_SUCCESS);
@@ -165,6 +192,7 @@ tcti_sgx_mgr_cancel_ocall (void **state)
 static void
 tcti_sgx_mgr_get_poll_handles_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
     TSS2_TCTI_POLL_HANDLE handles [2];
     size_t num_handles = 2;
@@ -176,6 +204,7 @@ tcti_sgx_mgr_get_poll_handles_ocall (void **state)
 static void
 tcti_sgx_mgr_set_locality_ocall_bad_id (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     rc = tcti_sgx_set_locality_ocall (BAD_ID, 2);
@@ -185,6 +214,7 @@ tcti_sgx_mgr_set_locality_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_set_locality_ocall (void **state)
 {
+    UNUSED (state);
     TSS2_RC rc;
 
     will_return (mock_set_locality, TSS2_RC_SUCCESS);

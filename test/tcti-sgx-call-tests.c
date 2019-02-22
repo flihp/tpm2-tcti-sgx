@@ -328,7 +328,7 @@ tcti_call_set_locality_bad_sequence_test (void **state)
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
 }
 int
-main(int argc, char* argv[])
+main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown (tcti_call_transmit_success_test,

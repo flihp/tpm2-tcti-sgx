@@ -12,10 +12,13 @@ extern "C" {
 }
 
 #include "tcti-sgx-mgr_priv.h"
+#include "util.h"
 
 static void
 tcti_sgx_mgr_init_null_callback (void **state)
 {
+    UNUSED (state);
+
     int ret = tcti_sgx_mgr_init (NULL, NULL);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     assert_int_equal (ret, 0);
