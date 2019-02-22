@@ -13,7 +13,7 @@
         TSS2_RC tcti_sgx_receive_ocall (uint64_t session_id,
                                         size_t size,
                                         [in, out, size=size] uint8_t *response,
-                                        uint32_t timeout);
+                                        int32_t timeout);
         void tcti_sgx_finalize_ocall (uint64_t session_id);
         TSS2_RC tcti_sgx_cancel_ocall (uint64_t session_id);
         TSS2_RC tcti_sgx_set_locality_ocall (uint64_t session_id,

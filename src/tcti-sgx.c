@@ -25,7 +25,7 @@ sgx_status_t tcti_sgx_receive_ocall (TSS2_RC *rc,
                                      uint64_t session_id,
                                      size_t size,
                                      uint8_t *response,
-                                     uint32_t timeout);
+                                     int32_t timeout);
 sgx_status_t tcti_sgx_finalize_ocall (uint64_t session_id);
 sgx_status_t tcti_sgx_cancel_ocall (TSS2_RC *rc,
                                     uint64_t session_id);
