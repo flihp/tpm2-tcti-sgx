@@ -4,5 +4,8 @@
 sgx_status_t
 print_string (const char *str)
 {
-    printf ("%s", str);
+    if (printf ("%s", str) >= 0)
+        return SGX_SUCCESS;
+    else
+        return SGX_ERROR_UNEXPECTED;
 }
