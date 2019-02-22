@@ -212,7 +212,7 @@ TSS2_RC
 tcti_sgx_receive_ocall (uint64_t id,
                         size_t size,
                         uint8_t *response,
-                        uint32_t timeout)
+                        int32_t timeout)
 {
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
     TctiSgxSession *session;
