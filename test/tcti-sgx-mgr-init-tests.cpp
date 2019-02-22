@@ -63,6 +63,7 @@ __wrap_calloc (size_t nmemb,
         return __real_calloc (nmemb, size);
     default:
         assert_true (false);
+        return NULL;
     }
 }
 
@@ -91,7 +92,7 @@ __wrap_open (const char *pathname,
      }
 }
 
-#define TEST_FD 0xa3c18ae2
+#define TEST_FD (int)0xa3c18ae2
 ssize_t
 __wrap_read (int fd,
              void *buf,
