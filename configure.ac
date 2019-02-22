@@ -159,6 +159,10 @@ AC_DEFUN(
     )]
 )
 ADD_LINK_FLAG([-Wl,-fuse-ld=gold])
+AS_IF([test "$CODE_COVERAGE_ENABLED" = "no"],
+      [ADD_LINK_FLAG([-Wl,-z,defs])])
+ADD_LINK_FLAG([-Wl,-z,now])
+ADD_LINK_FLAG([-Wl,-z,relro])
 ADD_LINK_FLAG([-Wl,--no-undefined],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-nostdlib],[ENCLAVE_LDFLAGS])
 ADD_LINK_FLAG([-nostartfiles],[ENCLAVE_LDFLAGS])
