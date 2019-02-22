@@ -85,10 +85,10 @@ src_libtss2_tcti_sgx_a_CFLAGS  = $(AM_CFLAGS) $(ENCLAVE_CFLAGS) $(CODE_COVERAGE_
 src_libtss2_tcti_sgx_a_SOURCES = src/tcti-sgx.c
 
 # application library
-src_libtcti_sgx_mgr_a_CXXFLAGS = $(AM_CXXFLAGS) $(CODE_COVERAGE_CFLAGS)
+src_libtcti_sgx_mgr_a_CXXFLAGS = $(AM_CXXFLAGS) $(CODE_COVERAGE_CXXFLAGS)
 src_libtcti_sgx_mgr_a_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
-src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CXXFLAGS) $(MSSIM_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+src_libtcti_sgx_mgr_la_CXXFLAGS  = $(AM_CXXFLAGS) $(MSSIM_CFLAGS) $(CODE_COVERAGE_CXXFLAGS)
 src_libtcti_sgx_mgr_la_LIBADD = $(MSSIM_LIBS)
 src_libtcti_sgx_mgr_la_SOURCES = src/tcti-util.cpp src/tcti-sgx-mgr.cpp
 
