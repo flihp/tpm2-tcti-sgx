@@ -139,12 +139,15 @@ ADD_COMPILER_FLAG([-fPIC])
 ADD_COMPILER_FLAG([-Wall])
 ADD_COMPILER_FLAG([-Werror])
 ADD_COMPILER_FLAG([-Wextra])
+ADD_COMPILER_FLAG([-fstack-protector])
+ADD_COMPILER_FLAG([-fstack-protector-strong])
+ADD_COMPILER_FLAG([-D_FORTIFY_SOURCE=2])
+ADD_COMPILER_FLAG([-Wformat -Wformat-security])
 ADD_CXX_COMPILER_FLAG([-std=c++11])
 AS_IF([test "$CODE_COVERAGE_ENABLED" = "no"],
       [ADD_COMPILER_FLAG([-fvisibility=hidden])])
 # CFLAGS used when building code that runs in the enclave
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
-ADD_COMPILER_FLAG([-fstack-protector],[ENCLAVE_CFLAGS])
 
 AC_DEFUN(
     [ADD_LINK_FLAG],
