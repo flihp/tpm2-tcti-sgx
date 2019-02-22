@@ -243,7 +243,6 @@ void SO_EXPORT
 tcti_sgx_finalize_ocall (uint64_t id)
 {
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance (NULL, NULL);
-    TctiSgxSession *session;
 
     mgr.lock ();
     mgr.session_remove (id);
