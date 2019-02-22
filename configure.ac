@@ -100,13 +100,14 @@ dnl   will check to be sure the compiler supports the flag. Unsupported
 dnl   flags will cause the configure script to fail.
 dnl $1: C compiler flag to check and add.
 dnl $2: Add flags to this variable.
+AC_DEFUN([default_cflag],[m4_default([$1],[EXTRA_CFLAGS])])
 AC_DEFUN(
     [ADD_COMPILER_FLAG],
     [AX_CHECK_COMPILE_FLAG(
         [$1],
         [
-            $2="$$2 $1"
-            AC_SUBST([$2])
+            default_cflag([$2])="$default_cflag([$2]) $1"
+            AC_SUBST(default_cflag([$2]))
         ],
         [AC_MSG_ERROR([Unsupported compile flag: $1])],
         [-Werror]
@@ -118,14 +119,15 @@ dnl   will check to be sure the compiler supports the flag. Unsupported
 dnl   flags will cause the configure script to fail.
 dnl $1: C++ compiler flag to check and add.
 dnl $2: Add flags to this variable.
+AC_DEFUN([default_cxxflag],[m4_default([$1],[EXTRA_CXXFLAGS])])
 AC_DEFUN(
     [ADD_CXX_COMPILER_FLAG],
     [AC_LANG_PUSH([C++])
      AX_CHECK_COMPILE_FLAG(
         [$1],
         [
-            $2="$$2 $1"
-            AC_SUBST([$2])
+            default_cxxflag([$2])="$default_cxxflag([$2]) $1"
+            AC_SUBST(default_cxxflag([$2]))
         ],
         [AC_MSG_ERROR([Unsupported compile flag: $1])],
         [-Werror])
@@ -133,12 +135,12 @@ AC_DEFUN(
     ]
 )
 
-ADD_COMPILER_FLAG([-fPIC],[EXTRA_CFLAGS])
+ADD_COMPILER_FLAG([-fPIC])
+ADD_CXX_COMPILER_FLAG([-std=c++11])
 # CFLAGS used when building code that runs in the enclave
 ADD_COMPILER_FLAG([-fvisibility=hidden],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
 ADD_COMPILER_FLAG([-fstack-protector],[ENCLAVE_CFLAGS])
-ADD_CXX_COMPILER_FLAG([-std=c++11],[EXTRA_CXXFLAGS])
 
 AC_DEFUN(
     [ADD_LINK_FLAG],
