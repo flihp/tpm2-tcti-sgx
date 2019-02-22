@@ -149,13 +149,14 @@ AS_IF([test "$CODE_COVERAGE_ENABLED" = "no"],
 # CFLAGS used when building code that runs in the enclave
 ADD_COMPILER_FLAG([-fpie],[ENCLAVE_CFLAGS])
 
+AC_DEFUN([default_ldflag],[m4_default([$1],[EXTRA_LDFLAGS])])
 AC_DEFUN(
     [ADD_LINK_FLAG],
     [AX_CHECK_LINK_FLAG(
         [$1],
         [
-            $2="$$2 $1"
-            AC_SUBST([$2])
+            default_ldflag([$2])="$default_ldflag([$2]) $1"
+            AC_SUBST(default_ldflag([$2]))
         ],
         [AC_MSG_ERROR([Unsupported link flag: $1])],
         [-Werror -Wl,-fuse-ld=gold]
