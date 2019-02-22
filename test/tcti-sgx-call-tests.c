@@ -24,7 +24,7 @@ static void
 tcti_call_transmit_success_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    size_t size;
+    size_t size = 0;
     uint8_t command;
 
     will_return (__wrap_tcti_sgx_transmit_ocall, TSS2_RC_SUCCESS);
@@ -43,7 +43,7 @@ static void
 tcti_call_transmit_sgx_fail_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    size_t size;
+    size_t size = 0;
     uint8_t command;
 
     will_return (__wrap_tcti_sgx_transmit_ocall, TSS2_RC_SUCCESS);
@@ -62,7 +62,7 @@ static void
 tcti_call_transmit_tcti_fail_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    size_t size;
+    size_t size = 0;
     uint8_t command;
 
     will_return (__wrap_tcti_sgx_transmit_ocall, TSS2_SYS_RC_BAD_REFERENCE);
@@ -98,7 +98,7 @@ tcti_call_receive_success_test (void **state)
     TCTI_CONTEXT_SGX *sgx_context = *state;
     size_t   size;
     uint8_t  response;
-    uint32_t timeout;
+    uint32_t timeout = TSS2_TCTI_TIMEOUT_BLOCK;
     TSS2_RC  rc;
 
     will_return (__wrap_tcti_sgx_receive_ocall, TSS2_RC_SUCCESS);
@@ -119,7 +119,7 @@ tcti_call_receive_sgx_fail_test (void **state)
     TCTI_CONTEXT_SGX *sgx_context = *state;
     size_t   size;
     uint8_t  response;
-    uint32_t timeout;
+    uint32_t timeout = TSS2_TCTI_TIMEOUT_BLOCK;
     TSS2_RC  rc;
 
     will_return (__wrap_tcti_sgx_receive_ocall, TSS2_RC_SUCCESS);
@@ -141,7 +141,7 @@ tcti_call_receive_tcti_fail_test (void **state)
     TCTI_CONTEXT_SGX *sgx_context = *state;
     size_t size;
     uint8_t response;
-    uint32_t timeout;
+    uint32_t timeout = TSS2_TCTI_TIMEOUT_BLOCK;
     TSS2_RC rc;
 
     will_return (__wrap_tcti_sgx_receive_ocall, TSS2_TCTI_RC_BAD_REFERENCE);
@@ -163,7 +163,7 @@ tcti_call_receive_bad_sequence_test (void **state)
     TSS2_TCTI_CONTEXT     *context     = *state;
     size_t size;
     uint8_t response;
-    uint32_t timeout;
+    uint32_t timeout = TSS2_TCTI_TIMEOUT_BLOCK;
     TSS2_RC rc;
 
     rc = tcti_sgx_receive (context, &size, &response, timeout);
@@ -239,7 +239,6 @@ static void
 tcti_call_cancel_bad_sequence_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    TCTI_CONTEXT_SGX *sgx_context = *state;
     TSS2_RC rc;
 
     rc = tcti_sgx_cancel (context);
@@ -269,12 +268,11 @@ static void
 tcti_call_set_locality_success_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    uint8_t locality;
     TSS2_RC rc;
 
     will_return (__wrap_tcti_sgx_set_locality_ocall, TSS2_RC_SUCCESS);
     will_return (__wrap_tcti_sgx_set_locality_ocall, SGX_SUCCESS);
-    rc = tcti_sgx_set_locality (context, locality);
+    rc = tcti_sgx_set_locality (context, 0);
     assert_int_equal (rc, TSS2_RC_SUCCESS);
 }
 /*
@@ -287,12 +285,11 @@ static void
 tcti_call_set_locality_sgx_fail_test (void **state)
 {
     TSS2_TCTI_CONTEXT *context = *state;
-    uint8_t locality;
     TSS2_RC rc;
 
     will_return (__wrap_tcti_sgx_set_locality_ocall, TSS2_RC_SUCCESS);
     will_return (__wrap_tcti_sgx_set_locality_ocall, SGX_ERROR_OCALL_NOT_ALLOWED);
-    rc = tcti_sgx_set_locality (context, locality);
+    rc = tcti_sgx_set_locality (context, 0);
     assert_int_equal (rc, TSS2_TCTI_RC_GENERAL_FAILURE);
 }
 /*
@@ -306,12 +303,11 @@ tcti_call_set_locality_tcti_fail_test (void **state)
 {
 
     TSS2_TCTI_CONTEXT *context = *state;
-    uint8_t locality;
     TSS2_RC rc;
 
     will_return (__wrap_tcti_sgx_set_locality_ocall, TSS2_TCTI_RC_NOT_PERMITTED);
     will_return (__wrap_tcti_sgx_set_locality_ocall, SGX_SUCCESS);
-    rc = tcti_sgx_set_locality (context, locality);
+    rc = tcti_sgx_set_locality (context, 0);
     assert_int_equal (rc, TSS2_TCTI_RC_NOT_PERMITTED);
 }
 /*
@@ -325,11 +321,10 @@ tcti_call_set_locality_bad_sequence_test (void **state)
 
     TSS2_TCTI_CONTEXT     *context     = *state;
     TCTI_CONTEXT_SGX *sgx_context = *state;
-    uint8_t locality;
     TSS2_RC rc;
 
     TCTI_SGX_STATE (sgx_context) = READY_TO_RECEIVE;
-    rc = tcti_sgx_set_locality (context, locality);
+    rc = tcti_sgx_set_locality (context, 0);
     assert_int_equal (rc, TSS2_TCTI_RC_BAD_SEQUENCE);
 }
 int

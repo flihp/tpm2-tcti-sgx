@@ -64,7 +64,7 @@ test_tcti_cb (void *user_data)
 static int
 tcti_sgx_mgr_ocalls_setup (void **state)
 {
-    int ret = tcti_sgx_mgr_init (test_tcti_cb, NULL);
+    tcti_sgx_mgr_init (test_tcti_cb, NULL);
     TctiSgxMgr& mgr = TctiSgxMgr::get_instance ();
     TctiSgxSession *session = new TctiSgxSession (GOOD_ID, test_tcti_cb (NULL));
 
@@ -140,9 +140,6 @@ tcti_sgx_mgr_finalize_ocall_bad_id (void **state)
 static void
 tcti_sgx_mgr_finalize_ocall (void **state)
 {
-    TctiSgxSession *session;
-    uint8_t buf [10] = { 0 };
-
     tcti_sgx_finalize_ocall (GOOD_ID);
 }
 
