@@ -39,12 +39,12 @@ main (int argc,
 
     ret = getcap_manufacturer (enclave_id, &manufact_id);
     if (ret != SGX_SUCCESS) {
-        printf ("%s: getcap_manufacturer for eid 0x%x failed with sgx_status_t "
+        printf ("%s: getcap_manufacturer for eid 0x%lx failed with sgx_status_t "
                 "0x%x\n", __func__, enclave_id, ret);
         return 1;
     }
 
-    printf ("EnclaveID 0x%x TPM2 ManufacturerID 0x%x\n",
+    printf ("EnclaveID 0x%lx TPM2 ManufacturerID 0x%x\n",
             enclave_id, manufact_id);
     return 0;
 }
